@@ -16,14 +16,14 @@ class Webkit::Handle {
   }
 
   static method new_opt : Webkit::Handle ($args : object[]) {
-    my $h = Hash->newa($args);
+    my $h = Hash->new($args);
     my $self = new Webkit::Handle;
     if (my $o = $h->get("timeout")) {
-      $self->{timeout} = ((Double)$o)->val;
+      $self->{timeout} = ((Double)$o)->value;
     }
     $self->{rbuf} = StringBuffer->new;
     if (my $o = $h->get("max_header_lines")) {
-      $self->{max_header_lines} = ((Int)$o)->val;
+      $self->{max_header_lines} = ((Int)$o)->value;
     }
     else {
       $self->{max_header_lines} = 64;
@@ -32,7 +32,7 @@ class Webkit::Handle {
   }
 
   private static method _to_hex : string ($val : int) {
-    my $res = ByteList->new;
+    my $res = ByteList->new(undef);
     while (1) {
       $res->push($Webkit::Client::_Hex->[$val % 16]);
       $val /= 16;
@@ -127,7 +127,7 @@ class Webkit::Handle {
     unless ($args->exists("port")) {
       die "Missing argument 'port'.";
     }
-    my $port = ((Int)($args->get("port")))->val;
+    my $port = ((Int)($args->get("port")))->value;
     $self->{socket} = Webkit::Socket->new($host, $port);
     $self->{rbuf} = StringBuffer->new;
     return $self;
@@ -172,7 +172,7 @@ class Webkit::Handle {
           $val = (string)$val_;
         }
         elsif ($val_ isa Int) {
-          $val = "" . ((Int)$val_)->val;
+          $val = "" . ((Int)$val_)->value;
         }
         else {
           die "Unexpected header value type. key: " . $ks->[$i];
@@ -208,7 +208,7 @@ class Webkit::Handle {
 
   method write_body : void ($headers : Hash, $content : string) {
     if (my $content_length_ = $headers->get("content-length")) {
-      my $content_length = ((Int)$content_length_)->val;
+      my $content_length = ((Int)$content_length_)->value;
       $self->write_content_body($content_length, $content);
     }
     else {
@@ -262,7 +262,7 @@ class Webkit::Handle {
       $headers : Hash) {
     my $lines = 0;
     unless ($headers) {
-      $headers = Hash->newa([]);
+      $headers = Hash->new([]);
     }
     while (1) {
       if (++$lines >= $self->{max_header_lines}) {
@@ -411,7 +411,7 @@ class Webkit::Handle {
       }
     }
     if ($content_length) {
-      my $len = $content_length->val;
+      my $len = $content_length->value;
       my $buf = StringBuffer->new;
       while ($len > 0) {
         my $read = $len;

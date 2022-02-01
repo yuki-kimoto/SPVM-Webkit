@@ -6,20 +6,33 @@ class Webkit::URL::Escape {
 
   private static method is_unreserved : int ($c : byte) {
     # RFC3986
-    return ('A' <= $c && $c <= 'Z') ||
+    my $is_unreserved = 0;
+    
+    
+    if (('A' <= $c && $c <= 'Z') ||
       ('a' <= $c && $c <= 'z') ||
       ('0' <= $c && $c <= '9') ||
       $c == '-' ||
       $c == '.' ||
       $c == '_' ||
-      $c == '~';
+      $c == '~')
+    {
+      $is_unreserved = 1;
+    }
+    
+    return $is_unreserved;
   }
 
   private static method is_sub_delim : int ($c : byte) {
-    return $c == '!' || $c == '$' || $c == '&' ||
+    my $is_sub_delim = 0;
+    
+    if ($c == '!' || $c == '$' || $c == '&' ||
       $c == '\'' || $c == '(' || $c == ')' ||
       $c == '*' || $c == '+' || $c == ',' ||
-      $c == ';' || $c == '=';
+      $c == ';' || $c == '=')
+    {
+      $is_sub_delim = 1;
+    }
   }
 
   private static method hex_index : int ($c : byte) {
@@ -39,10 +52,10 @@ class Webkit::URL::Escape {
     my $length = length $str;
     for (my $i = 0; $i < $length; ++$i) {
       my $c : int = $str->[$i] & 0xFF;
-      if (is_unreserved((byte)$c) || is_sub_delim((byte)$c)) {
+      if (&is_unreserved((byte)$c) || &is_sub_delim((byte)$c)) {
         $res .= [(byte)$c];
       } else {
-        $res .= ['%', HEX_CHARS()->[(int)($c / 16)], HEX_CHARS()->[$c % 16]];
+        $res .= ['%', &HEX_CHARS()->[(int)($c / 16)], &HEX_CHARS()->[$c % 16]];
       }
     }
     return $res;
@@ -52,7 +65,7 @@ class Webkit::URL::Escape {
     my $res = "";
     my $length = length $str;
     for (my $i = 0; $i < $length; ++$i) {
-      if (is_unreserved($str->[$i]) || is_sub_delim($str->[$i])) {
+      if (&is_unreserved($str->[$i]) || &is_sub_delim($str->[$i])) {
         $res .= [$str->[$i]];
       }
       else {
@@ -62,7 +75,7 @@ class Webkit::URL::Escape {
         unless ($i + 2 < $length) {
           die "string is broken. two hex-digits are required after '%'. str: $str";
         }
-        $res .= [(byte)(hex_index($str->[$i + 1]) * 16 + hex_index($str->[$i + 2]))];
+        $res .= [(byte)(&hex_index($str->[$i + 1]) * 16 + &hex_index($str->[$i + 2]))];
         $i += 2;
       }
     }

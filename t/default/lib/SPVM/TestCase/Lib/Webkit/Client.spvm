@@ -6,8 +6,8 @@ class TestCase::Lib::Webkit::Client {
   use Fn;
 
   static method test_get : int () {
-    my $client = ebkit::Client->new_opt([(object)
-      default_headers => Hash->newa([(object) Accept => "*/*" ])
+    my $client = Webkit::Client->new_opt([(object)
+      default_headers => Hash->new({Accept => "*/*"})
     ]);
 
     my $response = $client->request("GET", "http://testserver.spvm.info", undef);
@@ -15,7 +15,7 @@ class TestCase::Lib::Webkit::Client {
     unless ($response &&
         $response->{status} == 200 &&
         $response->{headers} &&
-        Fn->to_int((string)$response-> {headers}->get("content-length"), 10) == 5 &&
+        Fn->to_int((string)$response-> {headers}->get("content-length")) == 5 &&
         $response->{content} eq "Test\n") {
       return 0;
     }
@@ -24,8 +24,8 @@ class TestCase::Lib::Webkit::Client {
   }
 
   static method test_head : int () {
-    my $client = ebkit::Client->new_opt([(object)
-      default_headers => Hash->newa([(object) Accept => "*/*" ])
+    my $client = Webkit::Client->new_opt([(object)
+      default_headers => Hash->new({Accept => "*/*"})
     ]);
 
     my $response = $client->request("HEAD", "http://testserver.spvm.info", undef);
@@ -33,7 +33,7 @@ class TestCase::Lib::Webkit::Client {
     unless ($response &&
         $response->{status} == 200 &&
         $response->{headers} &&
-        Fn->to_int((string)$response->{headers}->get("content-length"), 10) == 5 &&
+        Fn->to_int((string)$response->{headers}->get("content-length")) == 5 &&
         $response->{content} eq "") {
       return 0;
     }
@@ -42,20 +42,18 @@ class TestCase::Lib::Webkit::Client {
   }
 
   static method test_post : int () {
-    my $client = ebkit::Client->new_opt([(object)
-      default_headers => Hash->newa([(object) Accept => "*/*" ])
+    my $client = Webkit::Client->new_opt([(object)
+      default_headers => Hash->new({Accept => "*/*"})
     ]);
 
     my $response = $client->request("POST", "http://testserver.spvm.info/echo", [(object)
       content => "post content",
-      headers => Hash->newa([(object)
-        "content-length" => 12,
-      ]),
+      headers => Hash->new({"content-length" => 12}),
     ]);
 
     unless ($response &&
         $response->{status} == 200 &&
-        Fn->to_int((string)$response->{headers}->get("content-length"), 10) == 27 &&
+        Fn->to_int((string)$response->{headers}->get("content-length")) == 27 &&
         $response->{content} eq "Echo server: 'post content'") {
       return 0;
     }
@@ -64,8 +62,8 @@ class TestCase::Lib::Webkit::Client {
   }
 
   static method test_post_form : int () {
-    my $client = ebkit::Client->new_opt([(object)
-      default_headers => Hash->newa([(object) Accept => "*/*" ])
+    my $client = Webkit::Client->new_opt([(object)
+      default_headers => Hash->new({Accept => "*/*"})
     ]);
 
     my $form = $client->www_form_urlencode([(object)
@@ -74,14 +72,12 @@ class TestCase::Lib::Webkit::Client {
     ]);
     my $response = $client->request("POST", "http://testserver.spvm.info/echo", [(object)
       content => $form,
-      headers => Hash->newa([(object)
-        "content-length" => length $form,
-      ]),
+      headers => Hash->new({"content-length" => length $form}),
     ]);
 
     unless ($response &&
         $response->{status} == 200 &&
-        Fn->to_int((string)$response->{headers}->get("content-length"), 10) == 37 &&
+        Fn->to_int((string)$response->{headers}->get("content-length")) == 37 &&
         $response->{content} eq "Echo server: 'param1=val1&param2=123'") {
       return 0;
     }
@@ -90,8 +86,8 @@ class TestCase::Lib::Webkit::Client {
   }
 
   static method test_post_form_syntax_sugar : int () {
-    my $client = ebkit::Client->new_opt([(object)
-      default_headers => Hash->newa([(object) Accept => "*/*" ])
+    my $client = Webkit::Client->new_opt([(object)
+      default_headers => Hash->new({Accept => "*/*"})
     ]);
 
     my $response = $client->post_form("http://testserver.spvm.info/echo", [(object)
@@ -101,7 +97,7 @@ class TestCase::Lib::Webkit::Client {
 
     unless ($response &&
         $response->{status} == 200 &&
-        Fn->to_int((string)$response->{headers}->get("content-length"), 10) == 74 &&
+        Fn->to_int((string)$response->{headers}->get("content-length")) == 74 &&
         $response->{content} eq "Echo server: '%E3%81%82%E3%81%84%E3%81%86%20abc=%E5%80%A4%20123&key=value'") {
       return 0;
     }
@@ -110,8 +106,8 @@ class TestCase::Lib::Webkit::Client {
   }
 
   static method test_get_chunk_small : int () {
-    my $client = ebkit::Client->new_opt([(object)
-      default_headers => Hash->newa([(object) Accept => "*/*" ])
+    my $client = Webkit::Client->new_opt([(object)
+      default_headers => Hash->new({Accept => "*/*"})
     ]);
 
     my $data = StringBuffer->new;
@@ -134,8 +130,8 @@ class TestCase::Lib::Webkit::Client {
   }
 
   static method test_get_chunk_large : int () {
-    my $client = ebkit::Client->new_opt([(object)
-      default_headers => Hash->newa([(object) Accept => "*/*" ])
+    my $client = Webkit::Client->new_opt([(object)
+      default_headers => Hash->new({Accept => "*/*"})
     ]);
 
     my $byte_data = [0];

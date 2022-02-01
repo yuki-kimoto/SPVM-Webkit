@@ -11,7 +11,7 @@ class Webkit::URL::Parameters {
     return $self;
   }
 
-  static method parse : Webkit::URL::Parameters ($str : string) {
+  method parse : Webkit::URL::Parameters ($str : string) {
     my $self = Webkit::URL::Parameters->new;
     my $length = length($str);
     my $start_token = 0;

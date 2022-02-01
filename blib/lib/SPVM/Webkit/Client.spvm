@@ -5,6 +5,7 @@ class Webkit::Client {
   use ByteList;
   use List;
   use Fn;
+  use Webkit::DataHandler;
   
   has default_headers : public Hash;
   has timeout : public double;
@@ -18,17 +19,17 @@ class Webkit::Client {
 
   static method new : Webkit::Client () {
     my $self = new Webkit::Client;
-    $self->{default_headers} = Hash->new;
+    $self->{default_headers} = Hash->new(undef);
     $self->{timeout} = 60;
     return $self;
   }
 
   static method new_opt : Webkit::Client ($args : object[]) {
 
-    my $h = Hash->newa($args);
+    my $h = Hash->new($args);
     my $self = new Webkit::Client;
     my $headers = (Hash)$h->get("default_headers");
-    $self->{default_headers} = Hash->new;
+    $self->{default_headers} = Hash->new(undef);
     my $keys = $headers->keys;
     for (my $i = 0; $i < @$keys; ++$i) {
       $self->{default_headers}->set(Fn->lc($keys->[$i]), $headers->get($keys->[$i]));
@@ -41,10 +42,10 @@ class Webkit::Client {
     my $form = $self->www_form_urlencode($data);
     return $self->request("POST", $url, [(object)
       content => $form,
-      headers => Hash->newa([(object)
+      headers => Hash->new({
         "content-type"   => "application/x-www-form-urlencoded",
         "content-length" => length $form,
-      ]),
+    }),
     ]);
   }
 
@@ -52,8 +53,8 @@ class Webkit::Client {
     unless (@$data % 2 == 0) {
       die "form data reference must have an even number of terms";
     }
-    my $params = List->newa($data);
-    my $terms = StringList->new;
+    my $params = List->new($data);
+    my $terms = StringList->new(undef);
     for (my $i = 0; $i < $params->length; $i += 2) {
       my $key = (string)$params->get($i);
       my $val = $params->get($i + 1);
@@ -70,7 +71,7 @@ class Webkit::Client {
           $string_val = (string)$val;
         }
         elsif ($val isa Int) {
-          $string_val = "" . ((Int)$val)->val;
+          $string_val = "" . ((Int)$val)->value;
         }
         else {
           die "Unexpected parameter value type. key: $key";
@@ -79,12 +80,12 @@ class Webkit::Client {
       }
     }
     my $terms_array = $terms->to_array;
-    Fn->sort_string($terms_array);
+    Fn->sort_string($terms_array, 0, scalar @$terms_array, method : int ($x : string, $y : string) { return $x cmp $y; });
     return Fn->join("&", $terms_array);
   }
 
   private method _url_escape : string ($s : string) {
-    my $res = ByteList->new;
+    my $res = ByteList->new(undef);
     my $length = length $s;
     for (my $i = 0; $i < $length; ++$i) {
       if (('A' <= $s->[$i] && $s->[$i] <= 'Z') ||
@@ -106,9 +107,11 @@ class Webkit::Client {
   private method _prepare_headers : Hash ($host : string, $port : int, $args_headers : Hash) {
     my $headers = $self->{default_headers}->copy;
     if ($args_headers) {
-      my $args_each = $args_headers->each;
-      for (my $i = 0; $i < @$args_each; ++$i) {
-        $headers->set(Fn->lc((string)$args_each->[$i]->[0]), $args_each->[$i]->[1]);
+      my $keys = $args_headers->keys;
+      for (my $i = 0; $i < @$keys; ++$i) {
+        my $key = $keys->[$i];
+        my $value = $args_headers->get($key);
+        $headers->set(Fn->lc($key), $value);
       }
     }
     my $host_port = $host;
@@ -132,10 +135,10 @@ class Webkit::Client {
     my $handle = Webkit::Handle->new_opt([(object)
       timeout => $self->{timeout},
     ]);
-    return $handle->connect(Hash->newa([(object)
+    return $handle->connect(Hash->new({
       host => $host,
       port => $port,
-    ]));
+    }));
   }
 
   private method _prepare_data_cb : Webkit::DataHandler (
@@ -181,7 +184,7 @@ class Webkit::Client {
     my $hash_args : Hash;
     my $args_headers : Hash;
     if ($args) {
-      $hash_args = Hash->newa($args);
+      $hash_args = Hash->new($args);
       if (my $o = $hash_args->get("headers")) {
         $args_headers = (Hash)$o;
       }

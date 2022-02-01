@@ -31,7 +31,6 @@ class TestCase::Lib::Webkit::Socket {
     return 1;
   }
 
-
   static method basic_auto_close : int () {
     
     # Socket

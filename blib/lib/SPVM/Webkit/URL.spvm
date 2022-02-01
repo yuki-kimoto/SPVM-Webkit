@@ -27,7 +27,7 @@ class Webkit::URL {
     return $self;
   }
 
-  private static method parse_scheme : int ($url : string) {
+  private method parse_scheme : int ($url : string) {
     my $length = length $url;
     for (my $i = 0; $i < $length; ++$i) {
       if ($url->[$i] == ':') {
@@ -155,7 +155,12 @@ class Webkit::URL {
 
   method has_trailing_slash : int () {
     my $length = length($self->{path});
-    return $length && $self->{path}->[$length - 1] == '/';
+    
+    my $has_trailing_slash = 0;
+    if ($length && $self->{path}->[$length - 1] == '/') {
+      $has_trailing_slash = 1;
+    }
+    return $has_trailing_slash;
   }
 
   method force_trailing_slash : void () {
@@ -172,7 +177,11 @@ class Webkit::URL {
   }
 
   method root_path_slashed : int () {
-    return length($self->{path}) && $self->{path}->[0] == '/';
+    my $root_path_slashed = 0;
+    if (length($self->{path}) && $self->{path}->[0] == '/') {
+      $root_path_slashed = 1;
+    }
+    return ;
   }
 
   method force_root_path_slashed : void () {

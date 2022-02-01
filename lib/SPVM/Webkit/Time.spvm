@@ -1,0 +1,9 @@
+class Webkit::Time {
+  use Time::Info;
+  
+  # Note: Time zone is not supported
+  native static method strptime : Time::Info ($str : string, $format : string);
+  
+  # Note: Time zone is not supported
+  native static method strftime : string ($format : string, $time_info : Time::Info);
+}

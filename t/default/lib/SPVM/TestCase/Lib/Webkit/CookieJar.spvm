@@ -1,6 +1,8 @@
 class TestCase::Lib::Webkit::CookieJar {
   use Webkit::CookieJar;
   use Time;
+  use Webkit::Time;
+
   # use Unistd(sleep);
 
   static method test_add_key_value : int () {
@@ -15,11 +17,11 @@ class TestCase::Lib::Webkit::CookieJar {
 
   static method test_add_expires : int () {
     my $time = 1557622506;
-    my $expires = Time->strftime("%a, %d %b %Y %H:%M:%S GMT", Time->gmtime($time));
+    my $expires = Webkit::Time->strftime("%a, %d %b %Y %H:%M:%S GMT", Time->gmtime($time));
     my $cookiejar = Webkit::CookieJar->new;
     $cookiejar->add("http://www.example.com", "foo=bar; Expires=$expires");
     my $cookie = $cookiejar->_cookie_from_jar("foo", "www.example.com", "/");
-    unless ($time == $cookie->{expiry_time}->val) {
+    unless ($time == $cookie->{expiry_time}->value) {
       return 0;
     }
     return 1;
@@ -31,7 +33,7 @@ class TestCase::Lib::Webkit::CookieJar {
     my $cookiejar = Webkit::CookieJar->new;
     $cookiejar->add("http://www.example.com", "foo=bar; Max-Age=$max_age");
     my $cookie = $cookiejar->_cookie_from_jar("foo", "www.example.com", "/");
-    unless ($cookie->{expiry_time}->val == $now + $max_age) {
+    unless ($cookie->{expiry_time}->value == $now + $max_age) {
       return 0;
     }
     return 1;
@@ -40,12 +42,12 @@ class TestCase::Lib::Webkit::CookieJar {
   static method test_add_prioritize_max_age_over_expires : int () {
     my $now = Time->time;
     my $max_age = 100;
-    my $expires = Time->strftime("%a, %d %b %Y %H:%M:%S GMT", Time->gmtime($now + 10000));
+    my $expires = Webkit::Time->strftime("%a, %d %b %Y %H:%M:%S GMT", Time->gmtime($now + 10000));
     my $cookiejar = Webkit::CookieJar->new;
     $cookiejar->add("http://www.example.com", "foo=bar; Max-Age=$max_age; Expires=$expires");
     my $cookie = $cookiejar->_cookie_from_jar("foo", "www.example.com", "/");
-    unless ($now + $max_age - 1 <= $cookie->{expiry_time}->val &&
-        $cookie->{expiry_time}->val <= $now + $max_age + 1) {
+    unless ($now + $max_age - 1 <= $cookie->{expiry_time}->value &&
+        $cookie->{expiry_time}->value <= $now + $max_age + 1) {
       return 0;
     }
     return 1;

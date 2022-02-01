@@ -23,7 +23,7 @@ class Webkit::CookieJar {
 
   static method new : Webkit::CookieJar () {
     my $self = new Webkit::CookieJar;
-    $self->{jar} = Hash->new;
+    $self->{jar} = Hash->new(undef);
     return $self;
   }
 
@@ -204,7 +204,7 @@ class Webkit::CookieJar {
   method cookies_for : Webkit::CookieJar::Cookie[] ($url : string) {
     my $request = Webkit::URL->parse($url);
     $request->force_root_path_slashed;
-    my $matched = List->new;
+    my $matched = List->new(undef);
     my $all_cookies = $self->{jar}->values;
     my $now = Time->time();
     for (my $i = 0; $i < @$all_cookies; ++$i) {
@@ -215,7 +215,7 @@ class Webkit::CookieJar {
       if ($cookie->{secure} && $request->{scheme} ne "https") {
         next;
       }
-      if ($cookie->{expiry_time} && $cookie->{expiry_time}->val < $now) {
+      if ($cookie->{expiry_time} && $cookie->{expiry_time}->value < $now) {
         next;
       }
       unless ($self->domain_match($request->{host}, $cookie->{domain})) {

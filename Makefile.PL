@@ -35,6 +35,7 @@ sub MY::postamble {
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Webkit::MIME::Base64');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Webkit::Socket');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Webkit::Select');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Webkit::Time');
   
   return $make_rule;
 }

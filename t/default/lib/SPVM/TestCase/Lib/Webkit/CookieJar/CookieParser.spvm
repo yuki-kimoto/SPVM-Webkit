@@ -1,7 +1,8 @@
 class TestCase::Lib::Webkit::CookieJar::CookieParser {
   use Webkit::CookieJar::CookieParser;
   use Time;
-
+  use Webkit::Time;
+  
   static method test_parse_only_key_value : int () {
     my $p = Webkit::CookieJar::CookieParser
         ->parse("key=value;");
@@ -13,7 +14,7 @@ class TestCase::Lib::Webkit::CookieJar::CookieParser {
 
   static method test_parse_expires : int () {
     my $now = Time->time;
-    my $expires_val = Time->strftime(
+    my $expires_val = Webkit::Time->strftime(
         "%a, %d %b %Y %H:%M:%S GMT", Time->gmtime($now));
     my $p = Webkit::CookieJar::CookieParser
         ->parse("foo=fuga; Expires=$expires_val;");

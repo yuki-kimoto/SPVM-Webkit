@@ -1,0 +1,30 @@
+class TestCase::Lib::Webkit::MIME::Base64 {
+  use Webkit::MIME::Base64;
+
+  private static method round_trip : string ($string : string) {
+    my $b64 = Webkit::MIME::Base64->new;
+    return $b64->decode($b64->encode($string));
+  }
+
+  static method test_basic : int () {
+    unless (round_trip("example") eq "example") {
+      return 0;
+    }
+    return 1;
+  }
+
+  static method test_all : int () {
+    my $b64 = Webkit::MIME::Base64->new;
+    for (my $case_index = 0; $case_index < 300; $case_index++) {
+      my $bytes = new byte[$case_index];
+      for (my $c = 0; $c < $case_index; $c++) {
+        $bytes->[$c] = (byte)($c % 127 + 1);
+      }
+      my $test = (string)$bytes;
+      unless (round_trip($test) eq $test) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+}

@@ -14,9 +14,9 @@
 #include <math.h>
 
 // Module file name
-static const char* MFILE = "SPVM/HTTP/Client/Select.c";
+static const char* MFILE = "Webkit/Select.c";
 
-int32_t SPNATIVE__SPVM__Webkit__Select___can_read(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Webkit__Select___can_read(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Self
   void* obj_self = stack[0].oval;
@@ -53,7 +53,7 @@ int32_t SPNATIVE__SPVM__Webkit__Select___can_read(SPVM_ENV* env, SPVM_VALUE* sta
   
   // Error check
   if (success_count == -1) {
-    SPVM_DIE("select fail", MFILE, __LINE__);
+    return env->die(env, "select fail", MFILE, __LINE__);
   }
   
   // Can handles
@@ -69,10 +69,10 @@ int32_t SPNATIVE__SPVM__Webkit__Select___can_read(SPVM_ENV* env, SPVM_VALUE* sta
   }
   stack[0].oval = obj_can_handles;
   
-  return SPVM_SUCCESS;
+  return 0;
 }
 
-int32_t SPNATIVE__SPVM__Webkit__Select___can_write(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Webkit__Select___can_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Self
   void* obj_self = stack[0].oval;
@@ -109,7 +109,7 @@ int32_t SPNATIVE__SPVM__Webkit__Select___can_write(SPVM_ENV* env, SPVM_VALUE* st
   
   // Error check
   if (success_count == -1) {
-    SPVM_DIE("select fail", MFILE, __LINE__);
+    return env->die(env, "select fail", MFILE, __LINE__);
   }
   
   // Can handles
@@ -125,10 +125,10 @@ int32_t SPNATIVE__SPVM__Webkit__Select___can_write(SPVM_ENV* env, SPVM_VALUE* st
   }
   stack[0].oval = obj_can_handles;
   
-  return SPVM_SUCCESS;
+  return 0;
 }
 
-int32_t SPNATIVE__SPVM__Webkit__Select___has_exception(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Webkit__Select___has_exception(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Self
   void* obj_self = stack[0].oval;
@@ -166,7 +166,7 @@ int32_t SPNATIVE__SPVM__Webkit__Select___has_exception(SPVM_ENV* env, SPVM_VALUE
   
   // Error check
   if (success_count == -1) {
-    SPVM_DIE("select fail", MFILE, __LINE__);
+    return env->die(env, "select fail", MFILE, __LINE__);
   }
   
   // Can handles
@@ -182,5 +182,5 @@ int32_t SPNATIVE__SPVM__Webkit__Select___has_exception(SPVM_ENV* env, SPVM_VALUE
   }
   stack[0].oval = obj_can_handles;
   
-  return SPVM_SUCCESS;
+  return 0;
 }

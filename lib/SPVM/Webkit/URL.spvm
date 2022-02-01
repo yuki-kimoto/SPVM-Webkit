@@ -1,28 +1,44 @@
-package SPVM::Webkit::URL {
-  use SPVM::Webkit::URL::Escape;
-  use SPVM::Webkit::URL::Parameters;
-  use SPVM::Util (sliceb, copy_str);
+class Webkit::URL {
+  use Webkit::URL::Escape;
+  use Webkit::URL::Parameters;
+  use Fn;
 
   # [scheme:][//[host][/path][?query][#fragment]
   has scheme    : public string;
   has host      : public string;
   has port      : public int;
   has path      : public string;
-  has params    : public SPVM::Webkit::URL::Parameters;
+  has params    : public Webkit::URL::Parameters;
   has fragment  : public string;
 
-  private sub parse_scheme : int ($self : self, $url : string) {
+  static method parse : Webkit::URL ($url : string) {
+    my $self = new Webkit::URL;
+
+    # set default values
+    $self->{scheme} = "";
+    $self->{host} = "";
+    $self->{port} = 80;
+    $self->{path} = "";
+    $self->{params} = Webkit::URL::Parameters->new();
+    $self->{fragment} = "";
+
+    $self->parse_url($url);
+
+    return $self;
+  }
+
+  private sub parse_scheme : int ($url : string) {
     my $length = length $url;
     for (my $i = 0; $i < $length; ++$i) {
       if ($url->[$i] == ':') {
-        $self->{scheme} = sliceb((byte [])$url, 0, $i);
+        $self->{scheme} = Fn->copy_array_range_byte((byte [])$url, 0, $i);
         return $i + 1;
       }
     }
     die "Cannot parse scheme: not found ':'";
   }
 
-  private sub parse_host : int ($self : self, $url : string, $start : int) {
+  private method parse_host : int ($url : string, $start : int) {
     my $length = length $url;
     unless ($start + 2 < $length &&
         $url->[$start] == '/' && $url->[$start + 1] == '/') {
@@ -33,18 +49,18 @@ package SPVM::Webkit::URL {
       if ($url->[$i] == '/' ||
           $url->[$i] == '?' ||
           $url->[$i] == '#') {
-        $self->{host} = sliceb((byte [])$url, $start, $i - $start);
+        $self->{host} = Fn->copy_array_range_byte((byte [])$url, $start, $i - $start);
         return $i;
       } elsif ($url->[$i] == ':') {
-        $self->{host} = sliceb((byte [])$url, $start, $i - $start);
+        $self->{host} = Fn->copy_array_range_byte((byte [])$url, $start, $i - $start);
         return $self->parse_port($url, $i + 1);
       }
     }
-    $self->{host} = sliceb((byte [])$url, $start, $length - $start);
+    $self->{host} = Fn->copy_array_range_byte((byte [])$url, $start, $length - $start);
     return $length;
   }
 
-  private sub parse_port : int ($self : self, $url : string, $start : int) {
+  private method parse_port : int ($url : string, $start : int) {
     my $length = length $url;
     my $port = 0;
     for (my $i = $start; $i < $length; ++$i) {
@@ -63,7 +79,7 @@ package SPVM::Webkit::URL {
     return $length;
   }
 
-  private sub parse_path : int ($self : self, $url : string, $start : int) {
+  private method parse_path : int ($url : string, $start : int) {
     my $length = length $url;
     unless ($start < $length && $url->[$start] == '/') {
       return $start;
@@ -72,54 +88,54 @@ package SPVM::Webkit::URL {
     ++$start;
     for (my $i = $start; $i < $length; ++$i) {
       if ($url->[$i] == '/') {
-        $self->{path} .= SPVM::Webkit::URL::Escape->unescape(
-          sliceb((byte [])$url, $start, $i - $start)) . "/";
+        $self->{path} .= Webkit::URL::Escape->unescape(
+          Fn->copy_array_range_byte((byte [])$url, $start, $i - $start)) . "/";
         $start = $i + 1;
       }
       elsif ($url->[$i] == '?' ||
           $url->[$i] == '#') {
-        $self->{path} .= SPVM::Webkit::URL::Escape->unescape(
-          sliceb((byte [])$url, $start, $i - $start));
+        $self->{path} .= Webkit::URL::Escape->unescape(
+          Fn->copy_array_range_byte((byte [])$url, $start, $i - $start));
         return $i;
       }
     }
     if ($start < $length) {
-      $self->{path} .= SPVM::Webkit::URL::Escape->unescape(
-        sliceb((byte [])$url, $start, $length - $start));
+      $self->{path} .= Webkit::URL::Escape->unescape(
+        Fn->copy_array_range_byte((byte [])$url, $start, $length - $start));
     }
     return $length;
   }
 
-  private sub parse_params : int ($self : self, $url : string, $start : int) {
+  private method parse_params : int ($url : string, $start : int) {
     my $length = length $url;
     unless ($start < $length && $url->[$start] == '?') {
       return $start;
     }
     for (my $i = $start + 1; $i < $length; ++$i) {
       if ($url->[$i] == '#') {
-        $self->{params} = SPVM::Webkit::URL::Parameters->parse(
-          sliceb((byte [])$url, $start + 1, $i - $start - 1)
+        $self->{params} = Webkit::URL::Parameters->parse(
+          Fn->copy_array_range_byte((byte [])$url, $start + 1, $i - $start - 1)
         );
         return $i;
       }
     }
-    $self->{params} = SPVM::Webkit::URL::Parameters->parse(
-      sliceb((byte [])$url, $start + 1, $length - $start - 1)
+    $self->{params} = Webkit::URL::Parameters->parse(
+      Fn->copy_array_range_byte((byte [])$url, $start + 1, $length - $start - 1)
     );
     return $length;
   }
 
-  private sub parse_fragment : void ($self : self, $url : string, $start : int) {
+  private method parse_fragment : void ($url : string, $start : int) {
     my $length = length $url;
     unless ($url->[$start] == '#') {
       return;
     }
     # https://stackoverflow.com/questions/2849756/list-of-valid-characters-for-the-fragment-identifier-in-an-url
-    $self->{fragment} = SPVM::Webkit::URL::Escape->unescape(
-        sliceb((byte [])$url, $start + 1, $length - $start - 1));
+    $self->{fragment} = Webkit::URL::Escape->unescape(
+        Fn->copy_array_range_byte((byte [])$url, $start + 1, $length - $start - 1));
   }
 
-  private sub parse_url : void ($self : self, $url : string) {
+  private method parse_url : void ($url : string) {
     my $length = length $url;
     my $next = $self->parse_scheme($url);
     $next = $self->parse_host($url, $next);
@@ -137,45 +153,29 @@ package SPVM::Webkit::URL {
     $self->parse_fragment($url, $next);
   }
 
-  sub parse : SPVM::Webkit::URL ($url : string) {
-    my $self = new SPVM::Webkit::URL;
-
-    # set default values
-    $self->{scheme} = "";
-    $self->{host} = "";
-    $self->{port} = 80;
-    $self->{path} = "";
-    $self->{params} = SPVM::Webkit::URL::Parameters->new();
-    $self->{fragment} = "";
-
-    $self->parse_url($url);
-
-    return $self;
-  }
-
-  sub has_trailing_slash : int ($self : self) {
+  method has_trailing_slash : int () {
     my $length = length($self->{path});
     return $length && $self->{path}->[$length - 1] == '/';
   }
 
-  sub force_trailing_slash : void ($self : self) {
+  method force_trailing_slash : void () {
     if (!$self->has_trailing_slash) {
       $self->{path} .= "/";
     }
   }
 
-  sub remove_trailing_slash : void ($self : self) {
+  method remove_trailing_slash : void () {
     if ($self->has_trailing_slash) {
-      $self->{path} = (string)sliceb(
+      $self->{path} = (string)Fn->copy_array_range_byte(
         (byte[])$self->{path}, 0, length($self->{path}) - 1);
     }
   }
 
-  sub root_path_slashed : int ($self : self) {
+  method root_path_slashed : int () {
     return length($self->{path}) && $self->{path}->[0] == '/';
   }
 
-  sub force_root_path_slashed : void ($self : self) {
+  method force_root_path_slashed : void () {
     if (length $self->{path}) {
       unless ($self->{path}->[0] == '/') {
         $self->{path} = "/" . $self->{path};
@@ -186,8 +186,8 @@ package SPVM::Webkit::URL {
     }
   }
 
-  sub to_string : string ($self : self) {
-    my $url = copy_str($self->{scheme}) . ":";
+  method to_string : string () {
+    my $url = Fn->copy_string($self->{scheme}) . ":";
     $url .= "//" . $self->{host}; # TODO: escape by punycode if needed
     if ($self->{port} != 80) { # "host:80" is default
       $url .= ":" . $self->{port};
@@ -197,7 +197,7 @@ package SPVM::Webkit::URL {
       $url .= "?" . $self->{params}->to_string;
     }
     if (length($self->{fragment})) {
-      $url .= "#" . SPVM::Webkit::URL::Escape->escape($self->{fragment});
+      $url .= "#" . Webkit::URL::Escape->escape($self->{fragment});
     }
     return $url;
   }
@@ -207,11 +207,11 @@ package SPVM::Webkit::URL {
 
 =head1 NAME
 
-SPVM::Webkit::URL - Uniform Resource Locators
+Webkit::URL - Uniform Resource Locators
 
 =head1 SYNOPSIS
 
-my $url = SPVM::Webkit::URL->parse($url_escaped);
+my $url = Webkit::URL->parse($url_escaped);
 my $scheme = $url->{scheme};
 my $host = $url->{host};
 my $port : int = $url->{port};

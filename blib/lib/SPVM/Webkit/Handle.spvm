@@ -1,0 +1,449 @@
+class Webkit::Handle {
+  use Webkit::Response;
+  use Webkit::Socket;
+  use StringBuffer;
+  use Util (lc, strtoi, substr, sliceb, index);
+
+  has timeout : public double;
+  has socket : public Webkit::Socket;
+  has rbuf : StringBuffer;
+  has max_header_lines : int;
+
+  our $_BUFSIZE : rw int;
+
+  INIT {
+    $_BUFSIZE = 32768;
+  }
+
+  sub new_opt : Webkit::Handle ($args : object[]) {
+    my $h = Hash->newa($args);
+    my $self = new Webkit::Handle;
+    if (my $o = $h->get("timeout")) {
+      $self->{timeout} = ((Double)$o)->val;
+    }
+    $self->{rbuf} = StringBuffer->new;
+    if (my $o = $h->get("max_header_lines")) {
+      $self->{max_header_lines} = ((Int)$o)->val;
+    }
+    else {
+      $self->{max_header_lines} = 64;
+    }
+    return $self;
+  }
+
+  sub connect : Webkit::Handle ($self : self, $args : Hash) {
+    unless ($args->exists("host")) {
+      die "Missing argument 'host'.";
+    }
+    my $host = (string)($args->get("host"));
+    unless ($args->exists("port")) {
+      die "Missing argument 'port'.";
+    }
+    my $port = ((Int)($args->get("port")))->val;
+    $self->{socket} = Webkit::Socket->new($host, $port);
+    $self->{rbuf} = StringBuffer->new;
+    return $self;
+  }
+
+  sub write : int ($self : self, $buf : StringBuffer) {
+    my $len = $buf->length;
+    my $off = 0;
+    while (1) {
+      my $data = $buf->substr($off, $len);
+      my $write_length = $self->{socket}->write($data, $len);
+      $len -= $write_length;
+      $off += $write_length;
+      unless ($len > 0) {
+        last;
+      }
+    }
+    
+    return $off;
+  }
+
+  sub write_header_lines : void ($self : self,
+      $headers : Hash, $prefix_data : string) {
+    my $buf = StringBuffer->new;
+    if ($prefix_data) {
+      $buf->push($prefix_data);
+    }
+    my $control_fields = ["host", "cache-control", "expect", "max-forwards", "pragma", "range", "te"];
+    my $seen = Hash->new;
+    for (my $i = 0; $i < @$control_fields; ++$i) {
+      if (my $v = $headers->get($control_fields->[$i])) {
+        $buf->push($control_fields->[$i] . ": " . (string)$v . "\r\n");
+        $seen->set($control_fields->[$i], 1);
+      }
+    }
+    my $ks = $headers->keys;
+    for (my $i = 0; $i < @$ks; ++$i) {
+      unless ($seen->get($ks->[$i])) {
+        my $val_ = $headers->get($ks->[$i]);
+        my $val : string;
+        if ($val_ isa string) {
+          $val = (string)$val_;
+        }
+        elsif ($val_ isa Int) {
+          $val = "" . ((Int)$val_)->val;
+        }
+        else {
+          die "Unexpected header value type. key: " . $ks->[$i];
+        }
+        $buf->push($ks->[$i] . ": $val\r\n");
+      }
+    }
+    $buf->push("\r\n");
+    $self->write($buf);
+  }
+
+  sub write_request_header : void ($self : self, $method : string,
+      $path_query : string, $headers : Hash) {
+    $self->write_header_lines($headers, "$method $path_query HTTP/1.1\r\n");
+  }
+
+  sub write_content_body : void ($self : self, $content_length : int, $content : string) {
+    my $buffer = StringBuffer->new;
+    $buffer->push($content);
+    my $len = $self->write($buffer);
+    unless ($len == $content_length) {
+      die "Content-Length mismatch (got: $len expected: $content_length)";
+    }
+  }
+
+  private sub _to_hex : string ($val : int) {
+    my $res = ByteList->new;
+    while (1) {
+      $res->push($Webkit::Client::_Hex->[$val % 16]);
+      $val /= 16;
+    }
+    return (string)$res->to_array;
+  }
+
+  sub write_chunked_body : void ($self : self, $content : string) {
+    my $len = length $content;
+    my $buffer = StringBuffer->new;
+    $buffer->push(_to_hex($len) . "\r\n$content\r\n");
+    $buffer->push("0\r\n");
+    $self->write($buffer);
+  }
+
+  sub write_body : void ($self : self, $headers : Hash, $content : string) {
+    if (my $content_length_ = $headers->get("content-length")) {
+      my $content_length = ((Int)$content_length_)->val;
+      $self->write_content_body($content_length, $content);
+    }
+    else {
+      $self->write_chunked_body($content);
+    }
+  }
+
+  sub write_request : void ($self : self, $method : string, $path_query : string,
+      $headers : Hash, $content : string) {
+    $self->write_request_header($method, $path_query, $headers);
+    if ($content) {
+      $self->write_body($headers, $content);
+    }
+  }
+
+  private sub _extract_line : string ($self : self) {
+    my $index = $self->{rbuf}->index("\n", 0);
+    if ($index < 0) {
+      return undef;
+    }
+    my $ret = $self->{rbuf}->substr(0, $index + 1);
+    if ($self->{rbuf}->length == $index + 1) {
+      $self->{rbuf} = StringBuffer->new;
+    }
+    else {
+      my $new_buffer = StringBuffer->new;
+      $new_buffer->push($self->{rbuf}->substr($index + 1, $self->{rbuf}->length - $index - 1));
+      $self->{rbuf} = $new_buffer;
+    }
+    return $ret;
+  }
+
+  sub readline : string ($self : self) {
+    while (1) {
+      if (my $line = $self->_extract_line) {
+        return $line;
+      }
+      my $buf = new byte [$_BUFSIZE];
+      my $r = $self->{socket}->read($buf);
+      if ($r > 0) {
+        $self->{rbuf}->push((string)sliceb($buf, 0, $r));
+      }
+      elsif ($r == 0) {
+        die "Unexpected end of stream while looking for line";
+      }
+    }
+    return $self->{rbuf}->to_string;
+  }
+
+  private sub _read_as : void ($target : string, $token : string, $pos : int&) {
+    unless (index($target, $token, $$pos) == 0) {
+      die "Malformed string. '$token' is expected: '$target'";
+    }
+    $$pos += length $token;
+  }
+
+  private sub _read_as_ws : void ($target : string, $pos : int&) {
+    unless ($target->[$$pos] == ' ' || $target->[$$pos] == '\t') {
+      die "Malformed string. No white spaces: '$target'";
+    }
+    my $len = length $target;
+    for (; $$pos < $len &&
+        $target->[$$pos] == ' ' ||
+        $target->[$$pos] == '\t';
+        ++$$pos) {}
+  }
+
+  private sub _capture : string ($target : string, $length : int, $pos : int&) {
+    my $ret = "";
+    eval {
+      $ret = substr($target, $$pos, $length);
+    };
+    if ($@) {
+      die "Malformed string, parse failed at $$pos. string: '$target'";
+    }
+    $$pos += $length;
+    return $ret;
+  }
+
+  private sub _as_digits : int ($string : string) {
+    my $length = length $string;
+    my $ret = 0;
+    for (my $i = 0; $i < $length; ++$i) {
+      $ret *= 10;
+      $ret += $string->[$i] - '0';
+    }
+    return $ret;
+  }
+
+  private sub _trim_left : string ($string : string) {
+    my $length = length $string;
+    for (my $i = 0; $i < $length; ++$i) {
+      if ($string->[$i] != ' ') {
+        return substr($string, $i, $length - $i);
+      }
+    }
+    return "";
+  }
+
+  private sub _header_field : string[] ($line : string) {
+    my $length = length $line;
+    my $name = "";
+    for (my $i = 0; $i < $length; ++$i) {
+      my $c = $line->[$i];
+      if ($c == ':') {
+        my $value = substr($line, $i + 1, index($line, "\r\n", $i + 1) - $i - 1);
+        $value = _trim_left($value);
+        return [$name, $value];
+      }
+      unless (('\x00' <= $c && $c <= '\x1F') || $c == '\x7F') { # control codes
+        $name .= [$c];
+      }
+    }
+    return undef;
+  }
+
+  private sub _read_header_lines : Hash ($self : self,
+      $headers : Hash) {
+    my $lines = 0;
+    unless ($headers) {
+      $headers = Hash->newa([]);
+    }
+    while (1) {
+      if (++$lines >= $self->{max_header_lines}) {
+        die "Header lines exceeds maximum number allowed of $self->{max_header_lines}";
+      }
+      my $line = $self->readline;
+      if (my $header_field = _header_field($line)) {
+        my $field_name = lc($header_field->[0]);
+        my $field_value = $header_field->[1];
+        if (my $o = $headers->get($field_name)) {
+          my $p : StringList;
+          if ($o isa string) {
+            $p = StringList->newa([(string)$o]);
+          }
+          else {
+            $p = (StringList)$o;
+          }
+          $p->push($field_value);
+        }
+        else {
+          $headers->set($field_name, $field_value);
+        }
+      }
+      elsif ($line eq "\r\n" || $line eq "\n") {
+        last;
+      }
+      else {
+        die "Malformed header line: '$line'";
+      }
+    }
+    return $headers;
+  }
+
+  sub read_response_header : Webkit::Response ($self : self) {
+    my $line = $self->readline;
+    my $pos = 0;
+    _read_as($line, "HTTP/", \$pos);
+    my $version = _capture($line, 3, \$pos);
+    unless ($version eq "1.0" || $version eq "1.1") {
+      die "Unsupported HTTP protocol HTTP/$version";
+    }
+    _read_as_ws($line, \$pos);
+    my $status = _capture($line, 3, \$pos);
+    _read_as_ws($line, \$pos);
+    my $reason = substr($line, $pos, length($line) - $pos - 2);
+    return Webkit::Response->new_opt([(object)
+      protocol => "HTTP/$version",
+      status   => _as_digits($status),
+      reason   => $reason,
+      headers  => $self->_read_header_lines(undef),
+    ]);
+  }
+
+  private sub _read_hex_length : int ($self : self) {
+    my $line = $self->readline;
+    if (length($line) <= 2) {
+      die "Malformed chunk-size: '$line'";
+    }
+    my $length : int;
+    eval {
+      $length = strtoi(substr($line, 0, length($line) - 2), 16);
+    };
+    if ($@) {
+      die "Malformed chunk-size. $@";
+    }
+    else {
+      return $length;
+    }
+  }
+
+  private sub _read : int ($self : self, $len : int,
+      $buf : StringBuffer, $allow_partial : int) {
+
+    my $updated = 0;
+
+    if (my $got = $self->{rbuf}->length) {
+      $updated = 1;
+      my $take = $len;
+      if ($take > $got) {
+        $take = $got;
+      }
+      $buf->push($self->{rbuf}->substr(0, $take));
+      if ($got > $take) {
+        my $new_buffer = StringBuffer->new;
+        $new_buffer->push($self->{rbuf}->substr($take, $got - $take));
+        $self->{rbuf} = $new_buffer;
+      }
+      else {
+        $self->{rbuf} = StringBuffer->new;
+      }
+      $len -= $take;
+    }
+
+    while ($len > 0) {
+      my $chunk = new byte [$len];
+      my $read_len : int;
+      eval {
+        $read_len = $self->{socket}->read($chunk);
+      };
+      if ($@) {
+        die "Could not read from socket: '$@'";
+      }
+
+      if ($read_len) {
+        $updated = 1;
+        $buf->push((string)sliceb($chunk, 0, $read_len));
+        $len -= $read_len;
+      }
+      else {
+        last;
+      }
+    }
+
+    if ($len && !$allow_partial) {
+      die "Unexpected end of stream";
+    }
+
+    return $updated;
+  }
+
+  private sub _read_chunked_body : int ($self : self,
+      $data_cb : Webkit::DataHandler,
+      $response : Webkit::Response) {
+    while (1) {
+      my $len = $self->_read_hex_length;
+      if ($len > 0) {
+        $self->_read_content_body($data_cb, $response, $len);
+        unless ($self->readline eq "\r\n") {
+          die "Malformed chunk: missing CRLF after chunk data";
+        }
+      }
+      else {
+        last;
+      }
+    }
+    $self->_read_header_lines($response->{headers});
+    return 1;
+  }
+
+  private sub _read_content_body : int ($self : self,
+      $data_cb : Webkit::DataHandler,
+      $response : Webkit::Response, $content_length : Int) {
+    if (!$content_length) {
+      if (my $o = $response->{headers}->get("content-length")) {
+        $content_length = strtoi((string)$o, 10);
+      }
+    }
+    if ($content_length) {
+      my $len = $content_length->val;
+      my $buf = StringBuffer->new;
+      while ($len > 0) {
+        my $read = $len;
+        if ($len > $_BUFSIZE) {
+          $read = $_BUFSIZE;
+        }
+        $self->_read($read, $buf, 0);
+        $len -= $read;
+      }
+      $data_cb->($buf->to_string, $response);
+      return $self->{rbuf}->length == 0;
+    }
+    else {
+      my $buf = StringBuffer->new;
+      while (1) {
+        unless ($self->_read($_BUFSIZE, $buf, 1)) {
+          last;
+        }
+      }
+      $data_cb->($buf->to_string, $response);
+      return 0;
+    }
+  }
+
+  private sub _has_chunked : int ($te : object) {
+    if ($te isa string) {
+      if ((string)$te eq "chunked") {
+        return 1;
+      }
+    }
+    elsif ($te isa StringList && ((StringList)$te)->grep("chunked")) {
+      return 1;
+    }
+    return 0;
+  }
+
+  sub read_body : int ($self : self, $data_cb : Webkit::DataHandler,
+      $response : Webkit::Response) {
+    my $te = $response->{headers}->get("transfer-encoding");
+    if ($te && _has_chunked($te)) {
+      return $self->_read_chunked_body($data_cb, $response);
+    }
+    else {
+      return $self->_read_content_body($data_cb, $response, undef);
+    }
+  }
+}

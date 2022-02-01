@@ -1,12 +1,10 @@
-package SPVM::Webkit::CookieJar {
-  use SPVM::Webkit::CookieJar::Cookie;
-  use SPVM::Webkit::CookieJar::CookieParser;
-  use SPVM::Webkit::URL;
-  use SPVM::Sort(sorto);
-  use SPVM::ObjectList;
-  use SPVM::Util (lc, strtoi, rindex, substr);
+class Webkit::CookieJar {
+  use Webkit::CookieJar::Cookie;
+  use Webkit::CookieJar::CookieParser;
+  use Webkit::URL;
+  use List;
 
-  has jar : SPVM::Hash;
+  has jar : Hash;
   has public_suffix_not_allowed : int;
 
   private sub _starts_with : int ($source : string, $prefix : string) {
@@ -23,10 +21,9 @@ package SPVM::Webkit::CookieJar {
     return 1;
   }
 
-
-  sub new : SPVM::Webkit::CookieJar () {
-    my $self = new SPVM::Webkit::CookieJar;
-    $self->{jar} = SPVM::Hash->new;
+  sub new : Webkit::CookieJar () {
+    my $self = new Webkit::CookieJar;
+    $self->{jar} = Hash->new;
     return $self;
   }
 
@@ -46,13 +43,13 @@ package SPVM::Webkit::CookieJar {
   private sub ends_with : int ($source : string, $suffix : string) {
     my $source_len = length $source;
     my $suffix_len = length $suffix;
-    return substr($source, $source_len - $suffix_len, $suffix_len) eq $suffix;
+    return Fn->substr($source, $source_len - $suffix_len, $suffix_len) eq $suffix;
   }
 
-  private sub domain_match : int ($self : self, $string : string,
+  private method domain_match : int ($string : string,
       $domain_string : string) {
-    $string = lc($string);
-    $domain_string = lc($domain_string);
+    $string = Fn->lc($string);
+    $domain_string = Fn->lc($domain_string);
     my $string_len = length $string;
     my $domain_string_len = length $domain_string;
     if ($string_len < $domain_string_len) {
@@ -75,7 +72,7 @@ package SPVM::Webkit::CookieJar {
     }
   }
 
-  private sub path_match : int ($self : self, $url_path : string,
+  private method path_match : int ($url_path : string,
       $cookie_path : string) {
     if ($url_path eq $cookie_path) {
       return 1;
@@ -94,28 +91,26 @@ package SPVM::Webkit::CookieJar {
     return 0;
   }
 
-  private sub default_path : string ($self : self, $url_path : string) {
+  private method default_path : string ($url_path : string) {
     my $length = length $url_path;
     if ($length < 2 || $url_path->[0] != '/') {
       return "/";
     }
-    my $rsep = rindex($url_path, "/", $length - 1);
+    my $rsep = Fn->rindex($url_path, "/", $length - 1);
     if ($rsep == 0) {
       return "/";
     }
-    return substr($url_path, 0, $rsep);
+    return Fn->substr($url_path, 0, $rsep);
   }
 
-  sub _cookie_from_jar : SPVM::Webkit::CookieJar::Cookie ($self : self,
-      $name : string, $domain : string, $path : string) {
-    if (my $cookie = ((SPVM::Hash)$self->{jar})->get("$name<>$domain<>$path")) {
-      return (SPVM::Webkit::CookieJar::Cookie)$cookie;
+  method _cookie_from_jar : Webkit::CookieJar::Cookie ($name : string, $domain : string, $path : string) {
+    if (my $cookie = ((Hash)$self->{jar})->get("$name<>$domain<>$path")) {
+      return (Webkit::CookieJar::Cookie)$cookie;
     }
     return undef;
   }
 
-  private sub update_cookie : void ($self : self,
-      $cookie : SPVM::Webkit::CookieJar::Cookie) {
+  private method update_cookie : void ($cookie : Webkit::CookieJar::Cookie) {
     $self->{jar}->set(
         $cookie->{name} . "<>" .
         $cookie->{domain} . "<>" .
@@ -127,25 +122,25 @@ package SPVM::Webkit::CookieJar {
   }
 
   # RFC 6265 5.3 Storage Model
-  sub add : int ($self : self, $url : string, $cookie_string : string) {
-    my $parse : SPVM::Webkit::CookieJar::CookieParser;
+  method add : int ($url : string, $cookie_string : string) {
+    my $parse : Webkit::CookieJar::CookieParser;
     eval {
-      $parse = SPVM::Webkit::CookieJar::CookieParser->parse($cookie_string);
+      $parse = Webkit::CookieJar::CookieParser->parse($cookie_string);
     };
     if ($@) {
       $@ = undef;
       return 0;
     }
-    my $request_url = SPVM::Webkit::URL->parse($url);
+    my $request_url = Webkit::URL->parse($url);
     $request_url->force_root_path_slashed;
 
-    my $cookie = SPVM::Webkit::CookieJar::Cookie->new;
+    my $cookie = Webkit::CookieJar::Cookie->new;
 
     $cookie->{name} = $parse->{name};
     $cookie->{value} = $parse->{value};
     my $now = $cookie->{creation_time}
         = $cookie->{last_access_time}
-        = SPVM::Time->time();
+        = Time->time();
 
     if ($parse->{max_age}) {
       $cookie->{persistent} = 1;
@@ -153,7 +148,7 @@ package SPVM::Webkit::CookieJar {
     }
     elsif ($parse->{expires}) {
       $cookie->{persistent} = 1;
-      $cookie->{expiry_time} = SPVM::Long->new($parse->{expires});
+      $cookie->{expiry_time} = Long->new($parse->{expires});
     }
     else {
       $cookie->{persistent} = 0;
@@ -199,22 +194,21 @@ package SPVM::Webkit::CookieJar {
     if (my $old = $self->_cookie_from_jar(
         $cookie->{name}, $cookie->{domain}, $cookie->{path})) {
       $cookie->{creation_time} =
-          ((SPVM::Webkit::CookieJar::Cookie)$old)->{creation_time};
+          ((Webkit::CookieJar::Cookie)$old)->{creation_time};
     }
 
     $self->update_cookie($cookie);
     return 1;
   }
 
-  sub cookies_for : SPVM::Webkit::CookieJar::Cookie[] ($self : self,
-      $url : string) {
-    my $request = SPVM::Webkit::URL->parse($url);
+  method cookies_for : Webkit::CookieJar::Cookie[] ($url : string) {
+    my $request = Webkit::URL->parse($url);
     $request->force_root_path_slashed;
-    my $matched = SPVM::ObjectList->new;
+    my $matched = List->new;
     my $all_cookies = $self->{jar}->values;
-    my $now = SPVM::Time->time();
+    my $now = Time->time();
     for (my $i = 0; $i < @$all_cookies; ++$i) {
-      my $cookie = (SPVM::Webkit::CookieJar::Cookie)$all_cookies->[$i];
+      my $cookie = (Webkit::CookieJar::Cookie)$all_cookies->[$i];
       if ($cookie->{host_only} && $request->{host} ne $cookie->{domain}) {
         next;
       }
@@ -232,13 +226,13 @@ package SPVM::Webkit::CookieJar {
       }
       $matched->push($cookie);
     }
-    my $ret = new SPVM::Webkit::CookieJar::Cookie[$matched->length];
+    my $ret = new Webkit::CookieJar::Cookie[$matched->length];
     for (my $i = 0; $i < $matched->length; ++$i) {
-      $ret->[$i] = (SPVM::Webkit::CookieJar::Cookie)($matched->get($i));
+      $ret->[$i] = (Webkit::CookieJar::Cookie)($matched->get($i));
     }
-    sorto($ret, sub : int ($self : self, $lhs : object, $rhs : object) {
-      my $l = (SPVM::Webkit::CookieJar::Cookie)$lhs;
-      my $r = (SPVM::Webkit::CookieJar::Cookie)$rhs;
+    Fn->sort_object($ret, method : int ($lhs : object, $rhs : object) {
+      my $l = (Webkit::CookieJar::Cookie)$lhs;
+      my $r = (Webkit::CookieJar::Cookie)$rhs;
       if (length $l->{path} > length $r->{path} ||
           $l->{creation_time} < $r->{creation_time}) {
         return -1;
@@ -248,7 +242,7 @@ package SPVM::Webkit::CookieJar {
     return $ret;
   }
 
-  sub cookie_header : string ($self : self, $url : string) {
+  method cookie_header : string ($url : string) {
     my $ret = "";
     my $matched = $self->cookies_for($url);
     for (my $i = 0; $i < @$matched; ++$i) {

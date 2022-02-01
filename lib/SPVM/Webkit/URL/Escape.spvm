@@ -1,10 +1,10 @@
-package SPVM::Webkit::URL::Escape {
+class Webkit::URL::Escape {
 
-  private sub HEX_CHARS : string () {
+  private static method HEX_CHARS : string () {
     return "0123456789ABCDEF";
   }
 
-  private sub is_unreserved : int ($c : byte) {
+  private static method is_unreserved : int ($c : byte) {
     # RFC3986
     return ('A' <= $c && $c <= 'Z') ||
       ('a' <= $c && $c <= 'z') ||
@@ -15,14 +15,14 @@ package SPVM::Webkit::URL::Escape {
       $c == '~';
   }
 
-  private sub is_sub_delim : int ($c : byte) {
+  private static method is_sub_delim : int ($c : byte) {
     return $c == '!' || $c == '$' || $c == '&' ||
       $c == '\'' || $c == '(' || $c == ')' ||
       $c == '*' || $c == '+' || $c == ',' ||
       $c == ';' || $c == '=';
   }
 
-  private sub hex_index : int ($c : byte) {
+  private static method hex_index : int ($c : byte) {
     if ('0' <= $c && $c <= '9') {
       return $c - '0';
     }
@@ -34,7 +34,7 @@ package SPVM::Webkit::URL::Escape {
     }
   }
 
-  sub escape : string ($str : string) {
+  static method escape : string ($str : string) {
     my $res = "";
     my $length = length $str;
     for (my $i = 0; $i < $length; ++$i) {
@@ -48,7 +48,7 @@ package SPVM::Webkit::URL::Escape {
     return $res;
   }
 
-  sub unescape : string ($str : string) {
+  static method unescape : string ($str : string) {
     my $res = "";
     my $length = length $str;
     for (my $i = 0; $i < $length; ++$i) {
@@ -74,6 +74,6 @@ package SPVM::Webkit::URL::Escape {
 
 =head1 NAME
 
-SPVM::Webkit::URL::Escape - Percent-encode and percent-decode unsafe characters
+Webkit::URL::Escape - Percent-encode and percent-decode unsafe characters
 
 =cut

@@ -1,28 +1,28 @@
-package SPVM::Webkit::Response {
-  use SPVM::Hash;
+class Webkit::Response {
+  use Hash;
 
   has protocol : public string;
   has status : public int;
   has reason : public string;
-  has headers : public SPVM::Hash;
+  has headers : public Hash;
   has content : public string;
   has success : public int;
   has url : public string;
 
-  sub new_opt : SPVM::Webkit::Response ($args : object[]) {
-    my $h = SPVM::Hash->newa($args);
-    my $self = new SPVM::Webkit::Response;
+  static method new_opt : Webkit::Response ($args : object[]) {
+    my $h = Hash->newa($args);
+    my $self = new Webkit::Response;
     if (my $o = $h->get("protocol")) {
       $self->{protocol} = (string)$o;
     }
     if (my $o = $h->get("status")) {
-      $self->{status} = ((SPVM::Int)$o)->val;
+      $self->{status} = ((Int)$o)->val;
     }
     if (my $o = $h->get("reason")) {
       $self->{reason} = (string)$o;
     }
     if (my $o = $h->get("headers")) {
-      $self->{headers} = (SPVM::Hash)$o;
+      $self->{headers} = (Hash)$o;
     }
     $self->{content} = "";
     $self->{success} = 0;
@@ -30,7 +30,7 @@ package SPVM::Webkit::Response {
     return $self;
   }
 
-  sub to_string : string ($self : self) {
+  method to_string : string () {
     my $hkeys = $self->{headers}->keys;
     my $headers = "";
     for (my $i = 0; $i < @$hkeys; ++$i) {

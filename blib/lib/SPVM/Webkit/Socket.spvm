@@ -1,17 +1,17 @@
-package SPVM::Webkit::Socket {
+class Webkit::Socket {
   
   has handle : int;
   
-  native sub new : SPVM::Webkit::Socket ($host : string, $port : int);
-  native sub read : int ($self : self, $buffer : byte[]);
-  native sub write : int ($self : self, $buffer : string, $length : int);
-  native sub close : void ($self : self);
-  native sub fileno : int ($self : self);
+  native static method new : Webkit::Socket ($host : string, $port : int);
+  native method read : int ($buffer : byte[]);
+  native method write : int ($buffer : string, $length : int);
+  native method close : void ();
+  native method fileno : int ();
   
-  sub DESTROY : void ($self : self) {
+  method DESTROY : void () {
     $self->_cleanup_wsa;
     $self->close;
   }
 
-  private native sub _cleanup_wsa : void ($self : self);
+  private native method _cleanup_wsa : void ();
 }

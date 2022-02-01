@@ -2,7 +2,7 @@ use 5.008007;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use SPVM::Builder::Util;
+use SPVM::Builder::Util::API;
 
 WriteMakefile(
     NAME             => 'SPVM::Webkit',
@@ -19,7 +19,7 @@ WriteMakefile(
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        SPVM => 0.0444,
+        SPVM => 0.9500,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'SPVM-Webkit-*' },
@@ -32,12 +32,9 @@ sub MY::postamble {
   my $make_rule = '';
   
   # Native compile make rule
-  $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::Webkit::MIME::Base64');
-  $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::Webkit::Socket');
-  $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::Webkit::Select');
-  
-  # Precompile make rule
-  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('SPVM::Webkit::JSON');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Webkit::MIME::Base64');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Webkit::Socket');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Webkit::Select');
   
   return $make_rule;
 }

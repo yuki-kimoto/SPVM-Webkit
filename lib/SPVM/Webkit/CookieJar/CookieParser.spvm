@@ -1,7 +1,7 @@
-package SPVM::Webkit::CookieJar::CookieParser {
-  use SPVM::Hash;
-  use SPVM::Time;
-  use SPVM::Util(split, lc, strtol, substr, index);
+class Webkit::CookieJar::CookieParser {
+  use Hash;
+  use Time;
+  use Fn;
 
   has name : public string;
   has value : public string;
@@ -12,13 +12,13 @@ package SPVM::Webkit::CookieJar::CookieParser {
   has secure : public int;
   has http_only : public int;
 
-  has extensions : public SPVM::Hash;
+  has extensions : public Hash;
 
-  private sub RFC1123_FORMAT : string () {
+  private method RFC1123_FORMAT : string () {
     return "%a, %d %b %Y %H:%M:%S GMT";
   }
 
-  private sub trim_space : string ($string : string) {
+  private method trim_space : string ($string : string) {
     my $cut_forward = "";
     my $ret = "";
     my $length = length $string;
@@ -43,14 +43,14 @@ package SPVM::Webkit::CookieJar::CookieParser {
     return $ret;
   }
 
-  private sub set_attribute_value : void ($self : self, $av : string) {
-    my $key_length = index($av, "=", 0);
+  private method set_attribute_value : void ($av : string) {
+    my $key_length = Fn->index($av, "=", 0);
     if ($key_length < 0) {
-      $av = trim_space($av);
+      $av = &trim_space($av);
       if (length($av) == 0) {
         return;
       }
-      my $lc_av = lc($av);
+      my $lc_av = Fn->lc($av);
       if ($lc_av eq "secure") {
         $self->{secure} = 1;
       }
@@ -62,16 +62,16 @@ package SPVM::Webkit::CookieJar::CookieParser {
       }
     }
     else {
-      my $key = trim_space(substr($av, 0, $key_length));
-      my $val = trim_space(substr($av, $key_length + 1,
+      my $key = &trim_space(Fn->substr($av, 0, $key_length));
+      my $val = &trim_space(Fn->substr($av, $key_length + 1,
           length $av - $key_length - 1));
-      my $lc_key = lc($key);
+      my $lc_key = Fn->lc($key);
       if ($lc_key eq "expires") {
-        $self->{expires} = SPVM::Time->timegm(
-            SPVM::Time->strptime($val, RFC1123_FORMAT()));
+        $self->{expires} = Time->timegm(
+            Time->strptime($val, RFC1123_FORMAT()));
       }
       elsif ($lc_key eq "max-age") {
-        $self->{max_age} = strtol($val, 10);
+        $self->{max_age} = Fn->to_long($val, 10);
       }
       elsif ($lc_key eq "domain") {
         $self->{domain} = $val;
@@ -85,16 +85,16 @@ package SPVM::Webkit::CookieJar::CookieParser {
     }
   }
 
-  sub parse : SPVM::Webkit::CookieJar::CookieParser ($string : string) {
-    my $self = new SPVM::Webkit::CookieJar::CookieParser;
-    $self->{extensions} = SPVM::Hash->new;
-    my $items = split(";", $string);
-    my $kv = split("=", $items->[0]);
+  method parse : Webkit::CookieJar::CookieParser ($string : string) {
+    my $self = new Webkit::CookieJar::CookieParser;
+    $self->{extensions} = Hash->new;
+    my $items = Fn->split(";", $string);
+    my $kv = Fn->split("=", $items->[0]);
     unless (@$kv == 2) {
       die "name-value pair is broken.";
     }
-    $self->{name} = trim_space($kv->[0]);
-    $self->{value} = trim_space($kv->[1]);
+    $self->{name} = &trim_space($kv->[0]);
+    $self->{value} = &trim_space($kv->[1]);
     for (my $i = 1; $i < @$items; ++$i) {
       $self->set_attribute_value($items->[$i]);
     }

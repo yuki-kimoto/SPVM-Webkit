@@ -1,7 +1,7 @@
 # This Makefile is for the SPVM::Webkit extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# 7.34 (Revision: 73400) from the contents of
+# 7.44 (Revision: 74400) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
@@ -19,7 +19,7 @@
 #     MIN_PERL_VERSION => q[5.008007]
 #     NAME => q[SPVM::Webkit]
 #     PL_FILES => {  }
-#     PREREQ_PM => { SPVM=>q[0.0444], Test::More=>q[0] }
+#     PREREQ_PM => { SPVM=>q[0.95], Test::More=>q[0] }
 #     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/SPVM/Webkit.pm]
 #     clean => { FILES=>q[SPVM-Webkit-*] }
@@ -31,7 +31,7 @@
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/5.20.1/x86_64-linux/Config.pm).
+# These definitions are from config.sh (via /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/5.32.1/x86_64-linux/Config.pm).
 # They may have been overridden via Makefile.PL or on the command line.
 AR = ar
 CC = cc
@@ -42,16 +42,16 @@ DLSRC = dl_dlopen.xs
 EXE_EXT = 
 FULL_AR = /usr/bin/ar
 LD = cc
-LDDLFLAGS = -shared -O2 -L/usr/local/lib -fstack-protector
-LDFLAGS =  -fstack-protector -L/usr/local/lib
-LIBC = libc-2.5.so
+LDDLFLAGS = -shared -O2 -L/usr/local/lib -fstack-protector-strong
+LDFLAGS =  -fstack-protector-strong -L/usr/local/lib
+LIBC = libc-2.27.so
 LIB_EXT = .a
 OBJ_EXT = .o
 OSNAME = linux
-OSVERS = 2.6.18-274.18.1.el5
+OSVERS = 4.15.0-55-generic
 RANLIB = :
-SITELIBEXP = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/site_perl/5.20.1
-SITEARCHEXP = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/site_perl/5.20.1/x86_64-linux
+SITELIBEXP = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/site_perl/5.32.1
+SITEARCHEXP = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/site_perl/5.32.1/x86_64-linux
 SO = so
 VENDORARCHEXP = 
 VENDORLIBEXP = 
@@ -78,60 +78,62 @@ INST_MAN1DIR = blib/man1
 INST_MAN3DIR = blib/man3
 MAN1EXT = 1
 MAN3EXT = 3
+MAN1SECTION = 1
+MAN3SECTION = 3
 INSTALLDIRS = site
 DESTDIR = 
 PREFIX = $(SITEPREFIX)
-PERLPREFIX = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1
-SITEPREFIX = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1
+PERLPREFIX = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1
+SITEPREFIX = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1
 VENDORPREFIX = 
-INSTALLPRIVLIB = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/5.20.1
+INSTALLPRIVLIB = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/5.32.1
 DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)
-INSTALLSITELIB = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/site_perl/5.20.1
+INSTALLSITELIB = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/site_perl/5.32.1
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
 INSTALLVENDORLIB = 
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/5.20.1/x86_64-linux
+INSTALLARCHLIB = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/5.32.1/x86_64-linux
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/site_perl/5.20.1/x86_64-linux
+INSTALLSITEARCH = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/site_perl/5.32.1/x86_64-linux
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
 INSTALLVENDORARCH = 
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
-INSTALLBIN = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/bin
+INSTALLBIN = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin
 DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)
-INSTALLSITEBIN = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/bin
+INSTALLSITEBIN = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin
 DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)
 INSTALLVENDORBIN = 
 DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)
-INSTALLSCRIPT = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/bin
+INSTALLSCRIPT = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin
 DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)
-INSTALLSITESCRIPT = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/bin
+INSTALLSITESCRIPT = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin
 DESTINSTALLSITESCRIPT = $(DESTDIR)$(INSTALLSITESCRIPT)
 INSTALLVENDORSCRIPT = 
 DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)
-INSTALLMAN1DIR = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/man/man1
+INSTALLMAN1DIR = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/man/man1
 DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)
-INSTALLSITEMAN1DIR = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/man/man1
+INSTALLSITEMAN1DIR = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/man/man1
 DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)
 INSTALLVENDORMAN1DIR = 
 DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)
-INSTALLMAN3DIR = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/man/man3
+INSTALLMAN3DIR = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/man/man3
 DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)
-INSTALLSITEMAN3DIR = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/man/man3
+INSTALLSITEMAN3DIR = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/man/man3
 DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
 INSTALLVENDORMAN3DIR = 
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
-PERL_LIB = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/5.20.1
-PERL_ARCHLIB = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/5.20.1/x86_64-linux
-PERL_ARCHLIBDEP = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/5.20.1/x86_64-linux
+PERL_LIB = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/5.32.1
+PERL_ARCHLIB = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/5.32.1/x86_64-linux
+PERL_ARCHLIBDEP = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/5.32.1/x86_64-linux
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile
 MAKEFILE_OLD = Makefile.old
 MAKE_APERL_FILE = Makefile.aperl
 PERLMAINCC = $(CC)
-PERL_INC = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/5.20.1/x86_64-linux/CORE
-PERL_INCDEP = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/5.20.1/x86_64-linux/CORE
-PERL = "/home/kimoto/perl5/perlbrew/perls/perl-5.20.1/bin/perl"
-FULLPERL = "/home/kimoto/perl5/perlbrew/perls/perl-5.20.1/bin/perl"
+PERL_INC = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/5.32.1/x86_64-linux/CORE
+PERL_INCDEP = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/5.32.1/x86_64-linux/CORE
+PERL = "/home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin/perl"
+FULLPERL = "/home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin/perl"
 ABSPERL = $(PERL)
 PERLRUN = $(PERL)
 FULLPERLRUN = $(FULLPERL)
@@ -144,9 +146,9 @@ PERM_DIR = 755
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/site_perl/5.20.1/ExtUtils/MakeMaker.pm
-MM_VERSION  = 7.34
-MM_REVISION = 73400
+MAKEMAKER   = /home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/5.32.1/ExtUtils/MakeMaker.pm
+MM_VERSION  = 7.44
+MM_REVISION = 74400
 
 # FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
 # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
@@ -170,8 +172,6 @@ O_FILES  =
 H_FILES  = 
 MAN1PODS = 
 MAN3PODS = lib/SPVM/Webkit.pm \
-	lib/SPVM/Webkit/JSON.pm \
-	lib/SPVM/Webkit/JSON/Bool.pm \
 	lib/SPVM/Webkit/MIME/Base64.pm
 
 # Where is the Config information that we are using/depend on
@@ -200,10 +200,8 @@ TO_INST_PM = lib/SPVM/Webkit.pm \
 	lib/SPVM/Webkit/CookieJar.spvm \
 	lib/SPVM/Webkit/CookieJar/Cookie.spvm \
 	lib/SPVM/Webkit/CookieJar/CookieParser.spvm \
-	lib/SPVM/Webkit/JSON.pm \
-	lib/SPVM/Webkit/JSON.spvm \
-	lib/SPVM/Webkit/JSON/Bool.pm \
-	lib/SPVM/Webkit/JSON/Bool.spvm \
+	lib/SPVM/Webkit/DataHandler.spvm \
+	lib/SPVM/Webkit/Handle.spvm \
 	lib/SPVM/Webkit/MIME/Base64.c \
 	lib/SPVM/Webkit/MIME/Base64.config \
 	lib/SPVM/Webkit/MIME/Base64.pm \
@@ -221,7 +219,7 @@ TO_INST_PM = lib/SPVM/Webkit.pm \
 
 
 # --- MakeMaker platform_constants section:
-MM_Unix_VERSION = 7.34
+MM_Unix_VERSION = 7.44
 PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc
 
 
@@ -444,13 +442,9 @@ POD2MAN = $(POD2MAN_EXE)
 
 manifypods : pure_all config  \
 	lib/SPVM/Webkit.pm \
-	lib/SPVM/Webkit/JSON.pm \
-	lib/SPVM/Webkit/JSON/Bool.pm \
 	lib/SPVM/Webkit/MIME/Base64.pm
-	$(NOECHO) $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) -u \
+	$(NOECHO) $(POD2MAN) --section=$(MAN3SECTION) --perm_rw=$(PERM_RW) -u \
 	  lib/SPVM/Webkit.pm $(INST_MAN3DIR)/SPVM::Webkit.$(MAN3EXT) \
-	  lib/SPVM/Webkit/JSON.pm $(INST_MAN3DIR)/SPVM::Webkit::JSON.$(MAN3EXT) \
-	  lib/SPVM/Webkit/JSON/Bool.pm $(INST_MAN3DIR)/SPVM::Webkit::JSON::Bool.$(MAN3EXT) \
 	  lib/SPVM/Webkit/MIME/Base64.pm $(INST_MAN3DIR)/SPVM::Webkit::MIME::Base64.$(MAN3EXT) 
 
 
@@ -527,7 +521,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'configure_requires:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  ExtUtils::MakeMaker: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'dynamic_config: 1' >> META_new.yml
-	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'license: artistic_2' >> META_new.yml
 	$(NOECHO) $(ECHO) 'meta-spec:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  url: http://module-build.sourceforge.net/META-spec-v1.4.html' >> META_new.yml
@@ -538,9 +532,10 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '    - t' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
-	$(NOECHO) $(ECHO) '  SPVM: '\''0.0444'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  SPVM: '\''0.95'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  perl: '\''5.008007'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'version: '\''0.01'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
@@ -549,7 +544,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      "Yuki Kimoto <kimoto.yuki@gmail.com>"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
 	$(NOECHO) $(ECHO) '   "dynamic_config" : 1,' >> META_new.json
-	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "license" : [' >> META_new.json
 	$(NOECHO) $(ECHO) '      "artistic_2"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
@@ -577,13 +572,14 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "runtime" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "SPVM" : "0.0444",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "SPVM" : "0.95",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "perl" : "5.008007"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.01"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.01",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.04"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -840,8 +836,8 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = perl
-FULLPERL      = "/home/kimoto/perl5/perlbrew/perls/perl-5.20.1/bin/perl"
-MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/5.20.1/x86_64-linux" "-I/home/kimoto/perl5/perlbrew/perls/perl-5.20.1/lib/5.20.1"
+FULLPERL      = "/home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin/perl"
+MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/5.32.1/x86_64-linux" "-I/home/kimoto/perl5/perlbrew/perls/perl-5.32.1/lib/5.32.1"
 
 $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
@@ -897,8 +893,8 @@ ppd :
 	$(NOECHO) $(ECHO) '    <AUTHOR>Yuki Kimoto &lt;kimoto.yuki@gmail.com&gt;</AUTHOR>' >> SPVM-Webkit.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> SPVM-Webkit.ppd
 	$(NOECHO) $(ECHO) '        <PERLCORE VERSION="5,008007,0,0" />' >> SPVM-Webkit.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="SPVM::" VERSION="0.0444" />' >> SPVM-Webkit.ppd
-	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-5.20" />' >> SPVM-Webkit.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="SPVM::" VERSION="0.95" />' >> SPVM-Webkit.ppd
+	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-5.32" />' >> SPVM-Webkit.ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> SPVM-Webkit.ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> SPVM-Webkit.ppd
 	$(NOECHO) $(ECHO) '</SOFTPKG>' >> SPVM-Webkit.ppd
@@ -913,10 +909,8 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/SPVM/Webkit/CookieJar.spvm' 'blib/lib/SPVM/Webkit/CookieJar.spvm' \
 	  'lib/SPVM/Webkit/CookieJar/Cookie.spvm' 'blib/lib/SPVM/Webkit/CookieJar/Cookie.spvm' \
 	  'lib/SPVM/Webkit/CookieJar/CookieParser.spvm' 'blib/lib/SPVM/Webkit/CookieJar/CookieParser.spvm' \
-	  'lib/SPVM/Webkit/JSON.pm' 'blib/lib/SPVM/Webkit/JSON.pm' \
-	  'lib/SPVM/Webkit/JSON.spvm' 'blib/lib/SPVM/Webkit/JSON.spvm' \
-	  'lib/SPVM/Webkit/JSON/Bool.pm' 'blib/lib/SPVM/Webkit/JSON/Bool.pm' \
-	  'lib/SPVM/Webkit/JSON/Bool.spvm' 'blib/lib/SPVM/Webkit/JSON/Bool.spvm' \
+	  'lib/SPVM/Webkit/DataHandler.spvm' 'blib/lib/SPVM/Webkit/DataHandler.spvm' \
+	  'lib/SPVM/Webkit/Handle.spvm' 'blib/lib/SPVM/Webkit/Handle.spvm' \
 	  'lib/SPVM/Webkit/MIME/Base64.c' 'blib/lib/SPVM/Webkit/MIME/Base64.c' \
 	  'lib/SPVM/Webkit/MIME/Base64.config' 'blib/lib/SPVM/Webkit/MIME/Base64.config' \
 	  'lib/SPVM/Webkit/MIME/Base64.pm' 'blib/lib/SPVM/Webkit/MIME/Base64.pm' \
@@ -950,37 +944,23 @@ config ::
 
 
 # --- MakeMaker postamble section:
-dynamic :: spvm_native_SPVM__Webkit__MIME__Base64  
-
-spvm_native_SPVM__Webkit__MIME__Base64  :: blib/lib/SPVM/Webkit/MIME/Base64.so
+dynamic :: blib/lib/SPVM/Webkit/MIME/Base64.so
+	$(NOECHO) $(NOOP)
 
 blib/lib/SPVM/Webkit/MIME/Base64.so :: lib/SPVM/Webkit/MIME/Base64.spvm lib/SPVM/Webkit/MIME/Base64.c lib/SPVM/Webkit/MIME/Base64.config
+	/home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin/perl -Mblib -MSPVM::Builder::API -e "SPVM::Builder::API->new(build_dir => '.spvm_build')->build_shared_lib_dist_native('Webkit::MIME::Base64')"
 
-	/home/kimoto/perl5/perlbrew/perls/perl-5.20.1/bin/perl -Mblib -MSPVM::Builder -e "SPVM::Builder->new(build_dir => 'spvm_build')->build_dll_native_dist('SPVM::Webkit::MIME::Base64')"
-
-dynamic :: spvm_native_SPVM__Webkit__Socket  
-
-spvm_native_SPVM__Webkit__Socket  :: blib/lib/SPVM/Webkit/Socket.so
+dynamic :: blib/lib/SPVM/Webkit/Socket.so
+	$(NOECHO) $(NOOP)
 
 blib/lib/SPVM/Webkit/Socket.so :: lib/SPVM/Webkit/Socket.spvm lib/SPVM/Webkit/Socket.c lib/SPVM/Webkit/Socket.config
+	/home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin/perl -Mblib -MSPVM::Builder::API -e "SPVM::Builder::API->new(build_dir => '.spvm_build')->build_shared_lib_dist_native('Webkit::Socket')"
 
-	/home/kimoto/perl5/perlbrew/perls/perl-5.20.1/bin/perl -Mblib -MSPVM::Builder -e "SPVM::Builder->new(build_dir => 'spvm_build')->build_dll_native_dist('SPVM::Webkit::Socket')"
-
-dynamic :: spvm_native_SPVM__Webkit__Select  
-
-spvm_native_SPVM__Webkit__Select  :: blib/lib/SPVM/Webkit/Select.so
+dynamic :: blib/lib/SPVM/Webkit/Select.so
+	$(NOECHO) $(NOOP)
 
 blib/lib/SPVM/Webkit/Select.so :: lib/SPVM/Webkit/Select.spvm lib/SPVM/Webkit/Select.c lib/SPVM/Webkit/Select.config
-
-	/home/kimoto/perl5/perlbrew/perls/perl-5.20.1/bin/perl -Mblib -MSPVM::Builder -e "SPVM::Builder->new(build_dir => 'spvm_build')->build_dll_native_dist('SPVM::Webkit::Select')"
-
-dynamic :: spvm_precompile_SPVM__Webkit__JSON  
-
-spvm_precompile_SPVM__Webkit__JSON  :: blib/lib/SPVM/Webkit/JSON.precompile.so
-
-blib/lib/SPVM/Webkit/JSON.precompile.so :: lib/SPVM/Webkit/JSON.spvm
-
-	/home/kimoto/perl5/perlbrew/perls/perl-5.20.1/bin/perl -Mblib -MSPVM::Builder -e "SPVM::Builder->new(build_dir => 'spvm_build')->build_dll_precompile_dist('SPVM::Webkit::JSON')"
+	/home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin/perl -Mblib -MSPVM::Builder::API -e "SPVM::Builder::API->new(build_dir => '.spvm_build')->build_shared_lib_dist_native('Webkit::Select')"
 
 
 

@@ -1,0 +1,3 @@
+class Webkit::DataHandler : callback_t {
+  sub : void ($self : self, $append : string, $target : object);
+}

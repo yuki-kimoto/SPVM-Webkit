@@ -1,9 +1,9 @@
-package SPVM::Webkit::CookieJar::Cookie {
-  use SPVM::Time::Info;
+package Webkit::CookieJar::Cookie {
+  use Time::Info;
 
   has name : public string;
   has value : public string;
-  has expiry_time : public SPVM::Long;
+  has expiry_time : public Long;
   has domain : public string;
   has path : public string;
   has creation_time : public long;
@@ -13,11 +13,11 @@ package SPVM::Webkit::CookieJar::Cookie {
   has secure : public int;
   has http_only : public int;
 
-  sub new : SPVM::Webkit::CookieJar::Cookie () {
-    return new SPVM::Webkit::CookieJar::Cookie;
+  static method new : Webkit::CookieJar::Cookie () {
+    return new Webkit::CookieJar::Cookie;
   }
 
-  sub to_string : string ($self : self) {
+  method to_string : string () {
     return $self->{name} . "=" . $self->{value};
   }
 }

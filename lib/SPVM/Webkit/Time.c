@@ -313,7 +313,7 @@ static const unsigned char *find_string(const unsigned char *bp, int *tgt, const
   /* Nothing matched */
   return NULL;
 }
-int32_t SPVM__Webkit__strptime(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Webkit__Time__strptime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t e;
   
@@ -354,7 +354,7 @@ int32_t SPVM__Webkit__strptime(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Webkit__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Webkit__Time__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
 
   int32_t e;
 

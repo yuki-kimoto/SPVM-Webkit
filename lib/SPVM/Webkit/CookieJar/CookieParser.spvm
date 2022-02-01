@@ -2,6 +2,7 @@ class Webkit::CookieJar::CookieParser {
   use Hash;
   use Time;
   use Fn;
+  use Webkit::Time;
 
   has name : public string;
   has value : public string;
@@ -14,11 +15,11 @@ class Webkit::CookieJar::CookieParser {
 
   has extensions : public Hash;
 
-  private method RFC1123_FORMAT : string () {
+  private static method RFC1123_FORMAT : string () {
     return "%a, %d %b %Y %H:%M:%S GMT";
   }
 
-  private method trim_space : string ($string : string) {
+  private static method trim_space : string ($string : string) {
     my $cut_forward = "";
     my $ret = "";
     my $length = length $string;
@@ -68,10 +69,10 @@ class Webkit::CookieJar::CookieParser {
       my $lc_key = Fn->lc($key);
       if ($lc_key eq "expires") {
         $self->{expires} = Time->timegm(
-            Time->strptime($val, &RFC1123_FORMAT()));
+            Webkit::Time->strptime($val, &RFC1123_FORMAT()));
       }
       elsif ($lc_key eq "max-age") {
-        $self->{max_age} = Fn->to_long($val, 10);
+        $self->{max_age} = Fn->to_long($val);
       }
       elsif ($lc_key eq "domain") {
         $self->{domain} = $val;
@@ -87,7 +88,7 @@ class Webkit::CookieJar::CookieParser {
 
   static method parse : Webkit::CookieJar::CookieParser ($string : string) {
     my $self = new Webkit::CookieJar::CookieParser;
-    $self->{extensions} = Hash->new;
+    $self->{extensions} = Hash->new(undef);
     my $items = Fn->split(";", $string);
     my $kv = Fn->split("=", $items->[0]);
     unless (@$kv == 2) {

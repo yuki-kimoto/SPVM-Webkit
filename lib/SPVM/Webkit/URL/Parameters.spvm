@@ -11,7 +11,7 @@ class Webkit::URL::Parameters {
     return $self;
   }
 
-  method parse : Webkit::URL::Parameters ($str : string) {
+  static method parse : Webkit::URL::Parameters ($str : string) {
     my $self = Webkit::URL::Parameters->new;
     my $length = length($str);
     my $start_token = 0;
@@ -28,8 +28,8 @@ class Webkit::URL::Parameters {
         if ($end_val < 0) {
           $end_val = $length;
         }
-        my $key = Fn->copy_array_range_byte((byte [])$str, $start_token, $i - $start_token);
-        my $val = Fn->copy_array_range_byte((byte [])$str, $start_val, $end_val - $start_val);
+        my $key = Fn->substr($str, $start_token, $i - $start_token);
+        my $val = Fn->substr($str, $start_val, $end_val - $start_val);
         $self->add($key, Webkit::URL::Escape->unescape($val));
         $start_token = $end_val + 1; # if $end_val < $length
         $i = $end_val;

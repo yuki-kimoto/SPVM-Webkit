@@ -204,7 +204,7 @@ class Webkit::CookieJar {
   method cookies_for : Webkit::CookieJar::Cookie[] ($url : string) {
     my $request = Webkit::URL->parse($url);
     $request->force_root_path_slashed;
-    my $matched = List->new(undef);
+    my $matched = List->new([]);
     my $all_cookies = $self->{jar}->values;
     my $now = Time->time();
     for (my $i = 0; $i < @$all_cookies; ++$i) {
@@ -230,7 +230,7 @@ class Webkit::CookieJar {
     for (my $i = 0; $i < $matched->length; ++$i) {
       $ret->[$i] = (Webkit::CookieJar::Cookie)($matched->get($i));
     }
-    Fn->sort_object($ret, method : int ($lhs : object, $rhs : object) {
+    Fn->sort_object($ret, 0, scalar @$ret, method : int ($lhs : object, $rhs : object) {
       my $l = (Webkit::CookieJar::Cookie)$lhs;
       my $r = (Webkit::CookieJar::Cookie)$rhs;
       if (length $l->{path} > length $r->{path} ||

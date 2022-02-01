@@ -31,7 +31,7 @@ class Webkit::URL {
     my $length = length $url;
     for (my $i = 0; $i < $length; ++$i) {
       if ($url->[$i] == ':') {
-        $self->{scheme} = Fn->copy_array_range_byte((byte [])$url, 0, $i);
+        $self->{scheme} = Fn->substr($url, 0, $i);
         return $i + 1;
       }
     }
@@ -49,14 +49,14 @@ class Webkit::URL {
       if ($url->[$i] == '/' ||
           $url->[$i] == '?' ||
           $url->[$i] == '#') {
-        $self->{host} = Fn->copy_array_range_byte((byte [])$url, $start, $i - $start);
+        $self->{host} = Fn->substr($url, $start, $i - $start);
         return $i;
       } elsif ($url->[$i] == ':') {
-        $self->{host} = Fn->copy_array_range_byte((byte [])$url, $start, $i - $start);
+        $self->{host} = Fn->substr($url, $start, $i - $start);
         return $self->parse_port($url, $i + 1);
       }
     }
-    $self->{host} = Fn->copy_array_range_byte((byte [])$url, $start, $length - $start);
+    $self->{host} = Fn->substr($url, $start, $length - $start);
     return $length;
   }
 
@@ -89,19 +89,19 @@ class Webkit::URL {
     for (my $i = $start; $i < $length; ++$i) {
       if ($url->[$i] == '/') {
         $self->{path} .= Webkit::URL::Escape->unescape(
-          Fn->copy_array_range_byte((byte [])$url, $start, $i - $start)) . "/";
+          Fn->substr($url, $start, $i - $start)) . "/";
         $start = $i + 1;
       }
       elsif ($url->[$i] == '?' ||
           $url->[$i] == '#') {
         $self->{path} .= Webkit::URL::Escape->unescape(
-          Fn->copy_array_range_byte((byte [])$url, $start, $i - $start));
+          Fn->substr($url, $start, $i - $start));
         return $i;
       }
     }
     if ($start < $length) {
       $self->{path} .= Webkit::URL::Escape->unescape(
-        Fn->copy_array_range_byte((byte [])$url, $start, $length - $start));
+        Fn->substr($url, $start, $length - $start));
     }
     return $length;
   }
@@ -114,13 +114,13 @@ class Webkit::URL {
     for (my $i = $start + 1; $i < $length; ++$i) {
       if ($url->[$i] == '#') {
         $self->{params} = Webkit::URL::Parameters->parse(
-          Fn->copy_array_range_byte((byte [])$url, $start + 1, $i - $start - 1)
+          Fn->substr($url, $start + 1, $i - $start - 1)
         );
         return $i;
       }
     }
     $self->{params} = Webkit::URL::Parameters->parse(
-      Fn->copy_array_range_byte((byte [])$url, $start + 1, $length - $start - 1)
+      Fn->substr($url, $start + 1, $length - $start - 1)
     );
     return $length;
   }
@@ -132,7 +132,7 @@ class Webkit::URL {
     }
     # https://stackoverflow.com/questions/2849756/list-of-valid-characters-for-the-fragment-identifier-in-an-url
     $self->{fragment} = Webkit::URL::Escape->unescape(
-        Fn->copy_array_range_byte((byte [])$url, $start + 1, $length - $start - 1));
+        Fn->substr($url, $start + 1, $length - $start - 1));
   }
 
   private method parse_url : void ($url : string) {
@@ -181,7 +181,7 @@ class Webkit::URL {
     if (length($self->{path}) && $self->{path}->[0] == '/') {
       $root_path_slashed = 1;
     }
-    return ;
+    return 0;
   }
 
   method force_root_path_slashed : void () {

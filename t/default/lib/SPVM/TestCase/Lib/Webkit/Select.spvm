@@ -3,7 +3,7 @@ class TestCase::Lib::Webkit::Select {
   use IO::File;
   use Fn;
 
-  sub add : int () {
+  static method add : int () {
     my $select = Webkit::Select->new;
     
     {
@@ -46,7 +46,7 @@ class TestCase::Lib::Webkit::Select {
     return 1;
   }
 
-  sub remove : int () {
+  static method remove : int () {
     my $select = Webkit::Select->new;
     
     {
@@ -98,7 +98,7 @@ class TestCase::Lib::Webkit::Select {
     return 1;
   }
 
-  sub exists : int () {
+  static method exists : int () {
     my $select = Webkit::Select->new;
     
     {
@@ -142,11 +142,11 @@ class TestCase::Lib::Webkit::Select {
     return 1;
   }
 
-  sub can_read : int () {
+  static method can_read : int () {
     my $select = Webkit::Select->new;
     
     {
-      my $ret = $select->add(STDIN());
+      my $ret = $select->add(IO::File->STDIN());
       unless ($ret == 1) {
         return 0;
       }
@@ -167,7 +167,7 @@ class TestCase::Lib::Webkit::Select {
     return 1;
   }
 
-  sub can_write : int () {
+  static method can_write : int () {
     my $select = Webkit::Select->new;
     
     {
@@ -196,11 +196,11 @@ class TestCase::Lib::Webkit::Select {
     return 1;
   }
 
-  sub has_exception : int () {
+  static method has_exception : int () {
     my $select = Webkit::Select->new;
     
     {
-      my $ret = $select->add(STDIN());
+      my $ret = $select->add(IO::File->STDIN());
       unless ($ret == 1) {
         return 0;
       }

@@ -2,7 +2,7 @@ class Webkit::Handle {
   use Webkit::Response;
   use Webkit::Socket;
   use StringBuffer;
-  use Util (lc, strtoi, substr, sliceb, index);
+  use Fn;
 
   has timeout : public double;
   has socket : public Webkit::Socket;
@@ -15,7 +15,7 @@ class Webkit::Handle {
     $_BUFSIZE = 32768;
   }
 
-  sub new_opt : Webkit::Handle ($args : object[]) {
+  static method new_opt : Webkit::Handle ($args : object[]) {
     my $h = Hash->newa($args);
     my $self = new Webkit::Handle;
     if (my $o = $h->get("timeout")) {
@@ -31,7 +31,95 @@ class Webkit::Handle {
     return $self;
   }
 
-  sub connect : Webkit::Handle ($self : self, $args : Hash) {
+  private static method _to_hex : string ($val : int) {
+    my $res = ByteList->new;
+    while (1) {
+      $res->push($Webkit::Client::_Hex->[$val % 16]);
+      $val /= 16;
+    }
+    return (string)$res->to_array;
+  }
+
+  private static method _read_as : void ($target : string, $token : string, $pos : int*) {
+    unless (Fn->index($target, $token, $$pos) == 0) {
+      die "Malformed string. '$token' is expected: '$target'";
+    }
+    $$pos += length $token;
+  }
+
+  private static method _read_as_ws : void ($target : string, $pos : int*) {
+    unless ($target->[$$pos] == ' ' || $target->[$$pos] == '\t') {
+      die "Malformed string. No white spaces: '$target'";
+    }
+    my $len = length $target;
+    for (; $$pos < $len &&
+        $target->[$$pos] == ' ' ||
+        $target->[$$pos] == '\t';
+        ++$$pos) {}
+  }
+
+  private static method _capture : string ($target : string, $length : int, $pos : int*) {
+    my $ret = "";
+    eval {
+      $ret = Fn->substr($target, $$pos, $length);
+    };
+    if ($@) {
+      die "Malformed string, parse failed at $$pos. string: '$target'";
+    }
+    $$pos += $length;
+    return $ret;
+  }
+
+  private static method _as_digits : int ($string : string) {
+    my $length = length $string;
+    my $ret = 0;
+    for (my $i = 0; $i < $length; ++$i) {
+      $ret *= 10;
+      $ret += $string->[$i] - '0';
+    }
+    return $ret;
+  }
+
+  private static method _trim_left : string ($string : string) {
+    my $length = length $string;
+    for (my $i = 0; $i < $length; ++$i) {
+      if ($string->[$i] != ' ') {
+        return Fn->substr($string, $i, $length - $i);
+      }
+    }
+    return "";
+  }
+
+  private static method _header_field : string[] ($line : string) {
+    my $length = length $line;
+    my $name = "";
+    for (my $i = 0; $i < $length; ++$i) {
+      my $c = $line->[$i];
+      if ($c == ':') {
+        my $value = Fn->substr($line, $i + 1, Fn->index($line, "\r\n", $i + 1) - $i - 1);
+        $value = &_trim_left($value);
+        return [$name, $value];
+      }
+      unless (('\x00' <= $c && $c <= '\x1F') || $c == '\x7F') { # control codes
+        $name .= [$c];
+      }
+    }
+    return undef;
+  }
+  
+  private static method _has_chunked : int ($te : object) {
+    if ($te isa string) {
+      if ((string)$te eq "chunked") {
+        return 1;
+      }
+    }
+    elsif ($te isa StringList && ((StringList)$te)->grep("chunked")) {
+      return 1;
+    }
+    return 0;
+  }
+
+  method connect : Webkit::Handle ($args : Hash) {
     unless ($args->exists("host")) {
       die "Missing argument 'host'.";
     }
@@ -45,7 +133,7 @@ class Webkit::Handle {
     return $self;
   }
 
-  sub write : int ($self : self, $buf : StringBuffer) {
+  method write : int ($buf : StringBuffer) {
     my $len = $buf->length;
     my $off = 0;
     while (1) {
@@ -61,7 +149,7 @@ class Webkit::Handle {
     return $off;
   }
 
-  sub write_header_lines : void ($self : self,
+  method write_header_lines : void (
       $headers : Hash, $prefix_data : string) {
     my $buf = StringBuffer->new;
     if ($prefix_data) {
@@ -96,12 +184,12 @@ class Webkit::Handle {
     $self->write($buf);
   }
 
-  sub write_request_header : void ($self : self, $method : string,
+  method write_request_header : void ($method : string,
       $path_query : string, $headers : Hash) {
     $self->write_header_lines($headers, "$method $path_query HTTP/1.1\r\n");
   }
 
-  sub write_content_body : void ($self : self, $content_length : int, $content : string) {
+  method write_content_body : void ($content_length : int, $content : string) {
     my $buffer = StringBuffer->new;
     $buffer->push($content);
     my $len = $self->write($buffer);
@@ -110,24 +198,15 @@ class Webkit::Handle {
     }
   }
 
-  private sub _to_hex : string ($val : int) {
-    my $res = ByteList->new;
-    while (1) {
-      $res->push($Webkit::Client::_Hex->[$val % 16]);
-      $val /= 16;
-    }
-    return (string)$res->to_array;
-  }
-
-  sub write_chunked_body : void ($self : self, $content : string) {
+  method write_chunked_body : void ($content : string) {
     my $len = length $content;
     my $buffer = StringBuffer->new;
-    $buffer->push(_to_hex($len) . "\r\n$content\r\n");
+    $buffer->push(&_to_hex($len) . "\r\n$content\r\n");
     $buffer->push("0\r\n");
     $self->write($buffer);
   }
 
-  sub write_body : void ($self : self, $headers : Hash, $content : string) {
+  method write_body : void ($headers : Hash, $content : string) {
     if (my $content_length_ = $headers->get("content-length")) {
       my $content_length = ((Int)$content_length_)->val;
       $self->write_content_body($content_length, $content);
@@ -137,7 +216,7 @@ class Webkit::Handle {
     }
   }
 
-  sub write_request : void ($self : self, $method : string, $path_query : string,
+  method write_request : void ($method : string, $path_query : string,
       $headers : Hash, $content : string) {
     $self->write_request_header($method, $path_query, $headers);
     if ($content) {
@@ -145,7 +224,7 @@ class Webkit::Handle {
     }
   }
 
-  private sub _extract_line : string ($self : self) {
+  private method _extract_line : string () {
     my $index = $self->{rbuf}->index("\n", 0);
     if ($index < 0) {
       return undef;
@@ -162,7 +241,7 @@ class Webkit::Handle {
     return $ret;
   }
 
-  sub readline : string ($self : self) {
+  method readline : string () {
     while (1) {
       if (my $line = $self->_extract_line) {
         return $line;
@@ -170,7 +249,7 @@ class Webkit::Handle {
       my $buf = new byte [$_BUFSIZE];
       my $r = $self->{socket}->read($buf);
       if ($r > 0) {
-        $self->{rbuf}->push((string)sliceb($buf, 0, $r));
+        $self->{rbuf}->push((string)Fn->copy_array_range_byte($buf, 0, $r));
       }
       elsif ($r == 0) {
         die "Unexpected end of stream while looking for line";
@@ -179,74 +258,7 @@ class Webkit::Handle {
     return $self->{rbuf}->to_string;
   }
 
-  private sub _read_as : void ($target : string, $token : string, $pos : int&) {
-    unless (index($target, $token, $$pos) == 0) {
-      die "Malformed string. '$token' is expected: '$target'";
-    }
-    $$pos += length $token;
-  }
-
-  private sub _read_as_ws : void ($target : string, $pos : int&) {
-    unless ($target->[$$pos] == ' ' || $target->[$$pos] == '\t') {
-      die "Malformed string. No white spaces: '$target'";
-    }
-    my $len = length $target;
-    for (; $$pos < $len &&
-        $target->[$$pos] == ' ' ||
-        $target->[$$pos] == '\t';
-        ++$$pos) {}
-  }
-
-  private sub _capture : string ($target : string, $length : int, $pos : int&) {
-    my $ret = "";
-    eval {
-      $ret = substr($target, $$pos, $length);
-    };
-    if ($@) {
-      die "Malformed string, parse failed at $$pos. string: '$target'";
-    }
-    $$pos += $length;
-    return $ret;
-  }
-
-  private sub _as_digits : int ($string : string) {
-    my $length = length $string;
-    my $ret = 0;
-    for (my $i = 0; $i < $length; ++$i) {
-      $ret *= 10;
-      $ret += $string->[$i] - '0';
-    }
-    return $ret;
-  }
-
-  private sub _trim_left : string ($string : string) {
-    my $length = length $string;
-    for (my $i = 0; $i < $length; ++$i) {
-      if ($string->[$i] != ' ') {
-        return substr($string, $i, $length - $i);
-      }
-    }
-    return "";
-  }
-
-  private sub _header_field : string[] ($line : string) {
-    my $length = length $line;
-    my $name = "";
-    for (my $i = 0; $i < $length; ++$i) {
-      my $c = $line->[$i];
-      if ($c == ':') {
-        my $value = substr($line, $i + 1, index($line, "\r\n", $i + 1) - $i - 1);
-        $value = _trim_left($value);
-        return [$name, $value];
-      }
-      unless (('\x00' <= $c && $c <= '\x1F') || $c == '\x7F') { # control codes
-        $name .= [$c];
-      }
-    }
-    return undef;
-  }
-
-  private sub _read_header_lines : Hash ($self : self,
+  private method _read_header_lines : Hash (
       $headers : Hash) {
     my $lines = 0;
     unless ($headers) {
@@ -257,8 +269,8 @@ class Webkit::Handle {
         die "Header lines exceeds maximum number allowed of $self->{max_header_lines}";
       }
       my $line = $self->readline;
-      if (my $header_field = _header_field($line)) {
-        my $field_name = lc($header_field->[0]);
+      if (my $header_field = &_header_field($line)) {
+        my $field_name = Fn->lc($header_field->[0]);
         my $field_value = $header_field->[1];
         if (my $o = $headers->get($field_name)) {
           my $p : StringList;
@@ -284,34 +296,34 @@ class Webkit::Handle {
     return $headers;
   }
 
-  sub read_response_header : Webkit::Response ($self : self) {
+  method read_response_header : Webkit::Response () {
     my $line = $self->readline;
     my $pos = 0;
-    _read_as($line, "HTTP/", \$pos);
-    my $version = _capture($line, 3, \$pos);
+    &_read_as($line, "HTTP/", \$pos);
+    my $version = &_capture($line, 3, \$pos);
     unless ($version eq "1.0" || $version eq "1.1") {
       die "Unsupported HTTP protocol HTTP/$version";
     }
-    _read_as_ws($line, \$pos);
-    my $status = _capture($line, 3, \$pos);
-    _read_as_ws($line, \$pos);
-    my $reason = substr($line, $pos, length($line) - $pos - 2);
+    &_read_as_ws($line, \$pos);
+    my $status = &_capture($line, 3, \$pos);
+    &_read_as_ws($line, \$pos);
+    my $reason = Fn->substr($line, $pos, length($line) - $pos - 2);
     return Webkit::Response->new_opt([(object)
       protocol => "HTTP/$version",
-      status   => _as_digits($status),
+      status   => &_as_digits($status),
       reason   => $reason,
       headers  => $self->_read_header_lines(undef),
     ]);
   }
 
-  private sub _read_hex_length : int ($self : self) {
+  private method _read_hex_length : int () {
     my $line = $self->readline;
     if (length($line) <= 2) {
       die "Malformed chunk-size: '$line'";
     }
     my $length : int;
     eval {
-      $length = strtoi(substr($line, 0, length($line) - 2), 16);
+      $length = Fn->to_int(Fn->substr($line, 0, length($line) - 2), 16);
     };
     if ($@) {
       die "Malformed chunk-size. $@";
@@ -321,7 +333,7 @@ class Webkit::Handle {
     }
   }
 
-  private sub _read : int ($self : self, $len : int,
+  private method _read : int ($len : int,
       $buf : StringBuffer, $allow_partial : int) {
 
     my $updated = 0;
@@ -356,7 +368,7 @@ class Webkit::Handle {
 
       if ($read_len) {
         $updated = 1;
-        $buf->push((string)sliceb($chunk, 0, $read_len));
+        $buf->push((string)Fn->copy_array_range_byte($chunk, 0, $read_len));
         $len -= $read_len;
       }
       else {
@@ -371,7 +383,7 @@ class Webkit::Handle {
     return $updated;
   }
 
-  private sub _read_chunked_body : int ($self : self,
+  private method _read_chunked_body : int (
       $data_cb : Webkit::DataHandler,
       $response : Webkit::Response) {
     while (1) {
@@ -390,12 +402,12 @@ class Webkit::Handle {
     return 1;
   }
 
-  private sub _read_content_body : int ($self : self,
+  private method _read_content_body : int (
       $data_cb : Webkit::DataHandler,
       $response : Webkit::Response, $content_length : Int) {
     if (!$content_length) {
       if (my $o = $response->{headers}->get("content-length")) {
-        $content_length = strtoi((string)$o, 10);
+        $content_length = Fn->to_int((string)$o, 10);
       }
     }
     if ($content_length) {
@@ -424,22 +436,10 @@ class Webkit::Handle {
     }
   }
 
-  private sub _has_chunked : int ($te : object) {
-    if ($te isa string) {
-      if ((string)$te eq "chunked") {
-        return 1;
-      }
-    }
-    elsif ($te isa StringList && ((StringList)$te)->grep("chunked")) {
-      return 1;
-    }
-    return 0;
-  }
-
-  sub read_body : int ($self : self, $data_cb : Webkit::DataHandler,
+  method read_body : int ($data_cb : Webkit::DataHandler,
       $response : Webkit::Response) {
     my $te = $response->{headers}->get("transfer-encoding");
-    if ($te && _has_chunked($te)) {
+    if ($te && &_has_chunked($te)) {
       return $self->_read_chunked_body($data_cb, $response);
     }
     else {

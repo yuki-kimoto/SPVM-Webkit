@@ -7,7 +7,7 @@ class TestCase::Lib::Webkit::MIME::Base64 {
   }
 
   static method test_basic : int () {
-    unless (round_trip("example") eq "example") {
+    unless (&round_trip("example") eq "example") {
       return 0;
     }
     return 1;
@@ -21,7 +21,7 @@ class TestCase::Lib::Webkit::MIME::Base64 {
         $bytes->[$c] = (byte)($c % 127 + 1);
       }
       my $test = (string)$bytes;
-      unless (round_trip($test) eq $test) {
+      unless (&round_trip($test) eq $test) {
         return 0;
       }
     }

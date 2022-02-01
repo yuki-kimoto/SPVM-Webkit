@@ -1,4 +1,4 @@
-package Webkit::CookieJar::Cookie {
+class Webkit::CookieJar::Cookie {
   use Time::Info;
 
   has name : public string;

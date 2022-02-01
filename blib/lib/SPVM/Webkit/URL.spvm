@@ -27,7 +27,7 @@ class Webkit::URL {
     return $self;
   }
 
-  private sub parse_scheme : int ($url : string) {
+  private static method parse_scheme : int ($url : string) {
     my $length = length $url;
     for (my $i = 0; $i < $length; ++$i) {
       if ($url->[$i] == ':') {

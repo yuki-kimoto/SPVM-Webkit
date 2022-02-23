@@ -10,13 +10,13 @@ class Webkit::Response {
   has url : public string;
 
   static method new_opt : Webkit::Response ($args : object[]) {
-    my $h = Hash->newa($args);
+    my $h = Hash->new($args);
     my $self = new Webkit::Response;
     if (my $o = $h->get("protocol")) {
       $self->{protocol} = (string)$o;
     }
     if (my $o = $h->get("status")) {
-      $self->{status} = ((Int)$o)->val;
+      $self->{status} = ((Int)$o)->value;
     }
     if (my $o = $h->get("reason")) {
       $self->{reason} = (string)$o;

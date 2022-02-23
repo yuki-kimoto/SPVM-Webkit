@@ -137,7 +137,7 @@ class Webkit::Handle {
     my $len = $buf->length;
     my $off = 0;
     while (1) {
-      my $data = $buf->substr($off, $len);
+      my $data = Fn->substr($buf->value, $off, $len);
       my $write_length = $self->{socket}->write($data, $len);
       $len -= $write_length;
       $off += $write_length;
@@ -156,7 +156,7 @@ class Webkit::Handle {
       $buf->push($prefix_data);
     }
     my $control_fields = ["host", "cache-control", "expect", "max-forwards", "pragma", "range", "te"];
-    my $seen = Hash->new;
+    my $seen = Hash->new({});
     for (my $i = 0; $i < @$control_fields; ++$i) {
       if (my $v = $headers->get($control_fields->[$i])) {
         $buf->push($control_fields->[$i] . ": " . (string)$v . "\r\n");
@@ -225,17 +225,17 @@ class Webkit::Handle {
   }
 
   private method _extract_line : string () {
-    my $index = $self->{rbuf}->index("\n", 0);
+    my $index = Fn->index_len($self->{rbuf}->value, "\n", 0, $self->{rbuf}->length);
     if ($index < 0) {
       return undef;
     }
-    my $ret = $self->{rbuf}->substr(0, $index + 1);
+    my $ret = Fn->substr($self->{rbuf}->value, 0, $index + 1);
     if ($self->{rbuf}->length == $index + 1) {
       $self->{rbuf} = StringBuffer->new;
     }
     else {
       my $new_buffer = StringBuffer->new;
-      $new_buffer->push($self->{rbuf}->substr($index + 1, $self->{rbuf}->length - $index - 1));
+      $new_buffer->push(Fn->substr($self->{rbuf}->value, $index + 1, $self->{rbuf}->length - $index - 1));
       $self->{rbuf} = $new_buffer;
     }
     return $ret;
@@ -275,7 +275,7 @@ class Webkit::Handle {
         if (my $o = $headers->get($field_name)) {
           my $p : StringList;
           if ($o isa string) {
-            $p = StringList->newa([(string)$o]);
+            $p = StringList->new([(string)$o]);
           }
           else {
             $p = (StringList)$o;
@@ -323,7 +323,7 @@ class Webkit::Handle {
     }
     my $length : int;
     eval {
-      $length = Fn->to_int(Fn->substr($line, 0, length($line) - 2), 16);
+      $length = Fn->to_int_with_base(Fn->substr($line, 0, length($line) - 2), 16);
     };
     if ($@) {
       die "Malformed chunk-size. $@";
@@ -344,10 +344,10 @@ class Webkit::Handle {
       if ($take > $got) {
         $take = $got;
       }
-      $buf->push($self->{rbuf}->substr(0, $take));
+      $buf->push(Fn->substr($self->{rbuf}->value, 0, $take));
       if ($got > $take) {
         my $new_buffer = StringBuffer->new;
-        $new_buffer->push($self->{rbuf}->substr($take, $got - $take));
+        $new_buffer->push(Fn->substr($self->{rbuf}->value, $take, $got - $take));
         $self->{rbuf} = $new_buffer;
       }
       else {
@@ -407,7 +407,7 @@ class Webkit::Handle {
       $response : Webkit::Response, $content_length : Int) {
     if (!$content_length) {
       if (my $o = $response->{headers}->get("content-length")) {
-        $content_length = Fn->to_int((string)$o, 10);
+        $content_length = Fn->to_int((string)$o);
       }
     }
     if ($content_length) {

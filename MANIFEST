@@ -1,6 +1,7 @@
 .spvm_build/work/object/SPVM/Webkit/MIME/Base64.o
 .spvm_build/work/object/SPVM/Webkit/Select.o
 .spvm_build/work/object/SPVM/Webkit/Socket.o
+.spvm_build/work/object/SPVM/Webkit/Time.o
 Changes
 ignore.txt
 lib/SPVM/Webkit.pm
@@ -10,10 +11,6 @@ lib/SPVM/Webkit/CookieJar/Cookie.spvm
 lib/SPVM/Webkit/CookieJar/CookieParser.spvm
 lib/SPVM/Webkit/DataHandler.spvm
 lib/SPVM/Webkit/Handle.spvm
-lib/SPVM/Webkit/MIME/Base64.c
-lib/SPVM/Webkit/MIME/Base64.config
-lib/SPVM/Webkit/MIME/Base64.pm
-lib/SPVM/Webkit/MIME/Base64.spvm
 lib/SPVM/Webkit/Response.spvm
 lib/SPVM/Webkit/Select.c
 lib/SPVM/Webkit/Select.config
@@ -39,7 +36,6 @@ t/default/lib/SPVM/TestCase/Lib/Webkit/Client.spvm
 t/default/lib/SPVM/TestCase/Lib/Webkit/CookieJar.spvm
 t/default/lib/SPVM/TestCase/Lib/Webkit/CookieJar/CookieParser.spvm
 t/default/lib/SPVM/TestCase/Lib/Webkit/JSON.spvm
-t/default/lib/SPVM/TestCase/Lib/Webkit/MIME/Base64.spvm
 t/default/lib/SPVM/TestCase/Lib/Webkit/Select.spvm
 t/default/lib/SPVM/TestCase/Lib/Webkit/Socket.spvm
 t/default/lib/SPVM/TestCase/Lib/Webkit/URL.spvm
@@ -47,7 +43,6 @@ t/default/lib/SPVM/TestCase/Lib/Webkit/URL/Parameters.spvm
 t/default/modules/SPVM-Webkit-Client.t
 t/default/modules/SPVM-Webkit-CookieJar-CookieParser.t
 t/default/modules/SPVM-Webkit-CookieJar.t
-t/default/modules/SPVM-Webkit-MIME-Base64.t
 t/default/modules/SPVM-Webkit-Select.t
 t/default/modules/SPVM-Webkit-Socket.t
 t/default/modules/SPVM-Webkit-URL-Parameters.t

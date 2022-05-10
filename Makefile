@@ -171,8 +171,7 @@ C_FILES  =
 O_FILES  = 
 H_FILES  = 
 MAN1PODS = 
-MAN3PODS = lib/SPVM/Webkit.pm \
-	lib/SPVM/Webkit/MIME/Base64.pm
+MAN3PODS = lib/SPVM/Webkit.pm
 
 # Where is the Config information that we are using/depend on
 CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
@@ -202,10 +201,6 @@ TO_INST_PM = lib/SPVM/Webkit.pm \
 	lib/SPVM/Webkit/CookieJar/CookieParser.spvm \
 	lib/SPVM/Webkit/DataHandler.spvm \
 	lib/SPVM/Webkit/Handle.spvm \
-	lib/SPVM/Webkit/MIME/Base64.c \
-	lib/SPVM/Webkit/MIME/Base64.config \
-	lib/SPVM/Webkit/MIME/Base64.pm \
-	lib/SPVM/Webkit/MIME/Base64.spvm \
 	lib/SPVM/Webkit/Response.spvm \
 	lib/SPVM/Webkit/Select.c \
 	lib/SPVM/Webkit/Select.config \
@@ -444,11 +439,9 @@ POD2MAN = $(POD2MAN_EXE)
 
 
 manifypods : pure_all config  \
-	lib/SPVM/Webkit.pm \
-	lib/SPVM/Webkit/MIME/Base64.pm
+	lib/SPVM/Webkit.pm
 	$(NOECHO) $(POD2MAN) --section=$(MAN3SECTION) --perm_rw=$(PERM_RW) -u \
-	  lib/SPVM/Webkit.pm $(INST_MAN3DIR)/SPVM::Webkit.$(MAN3EXT) \
-	  lib/SPVM/Webkit/MIME/Base64.pm $(INST_MAN3DIR)/SPVM::Webkit::MIME::Base64.$(MAN3EXT) 
+	  lib/SPVM/Webkit.pm $(INST_MAN3DIR)/SPVM::Webkit.$(MAN3EXT) 
 
 
 
@@ -914,10 +907,6 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/SPVM/Webkit/CookieJar/CookieParser.spvm' 'blib/lib/SPVM/Webkit/CookieJar/CookieParser.spvm' \
 	  'lib/SPVM/Webkit/DataHandler.spvm' 'blib/lib/SPVM/Webkit/DataHandler.spvm' \
 	  'lib/SPVM/Webkit/Handle.spvm' 'blib/lib/SPVM/Webkit/Handle.spvm' \
-	  'lib/SPVM/Webkit/MIME/Base64.c' 'blib/lib/SPVM/Webkit/MIME/Base64.c' \
-	  'lib/SPVM/Webkit/MIME/Base64.config' 'blib/lib/SPVM/Webkit/MIME/Base64.config' \
-	  'lib/SPVM/Webkit/MIME/Base64.pm' 'blib/lib/SPVM/Webkit/MIME/Base64.pm' \
-	  'lib/SPVM/Webkit/MIME/Base64.spvm' 'blib/lib/SPVM/Webkit/MIME/Base64.spvm' \
 	  'lib/SPVM/Webkit/Response.spvm' 'blib/lib/SPVM/Webkit/Response.spvm' \
 	  'lib/SPVM/Webkit/Select.c' 'blib/lib/SPVM/Webkit/Select.c' \
 	  'lib/SPVM/Webkit/Select.config' 'blib/lib/SPVM/Webkit/Select.config' \
@@ -950,12 +939,6 @@ config ::
 
 
 # --- MakeMaker postamble section:
-dynamic :: blib/lib/SPVM/Webkit/MIME/Base64.so
-	$(NOECHO) $(NOOP)
-
-blib/lib/SPVM/Webkit/MIME/Base64.so :: lib/SPVM/Webkit/MIME/Base64.spvm lib/SPVM/Webkit/MIME/Base64.c lib/SPVM/Webkit/MIME/Base64.config
-	/home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin/perl -Mblib -MSPVM::Builder::API -e "SPVM::Builder::API->new(build_dir => '.spvm_build')->build_shared_lib_dist_native('Webkit::MIME::Base64')"
-
 dynamic :: blib/lib/SPVM/Webkit/Socket.so
 	$(NOECHO) $(NOOP)
 

@@ -1,8 +1,0 @@
-class Webkit::MIME::Base64 {
-  static method new : Webkit::MIME::Base64 () {
-    return new Webkit::MIME::Base64;
-  }
-  
-  native method encode : string ($binary : string);
-  native method decode : string ($base64_text : string);
-}

@@ -1,11 +1,11 @@
 class Webkit::Handle {
   use Webkit::Response;
-  use Webkit::Socket;
+  use IO::Socket;
   use StringBuffer;
   use Fn;
 
   has timeout : public double;
-  has socket : public Webkit::Socket;
+  has socket : public IO::Socket;
   has rbuf : StringBuffer;
   has max_header_lines : int;
 
@@ -128,7 +128,7 @@ class Webkit::Handle {
       die "Missing argument 'port'.";
     }
     my $port = ((Int)($args->get("port")))->value;
-    $self->{socket} = Webkit::Socket->new($host, $port);
+    $self->{socket} = IO::Socket->new($host, $port);
     $self->{rbuf} = StringBuffer->new;
     return $self;
   }

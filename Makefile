@@ -202,9 +202,6 @@ TO_INST_PM = lib/SPVM/Webkit.pm \
 	lib/SPVM/Webkit/DataHandler.spvm \
 	lib/SPVM/Webkit/Handle.spvm \
 	lib/SPVM/Webkit/Response.spvm \
-	lib/SPVM/Webkit/Select.c \
-	lib/SPVM/Webkit/Select.config \
-	lib/SPVM/Webkit/Select.spvm \
 	lib/SPVM/Webkit/Time.c \
 	lib/SPVM/Webkit/Time.config \
 	lib/SPVM/Webkit/Time.spvm \
@@ -905,9 +902,6 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/SPVM/Webkit/DataHandler.spvm' 'blib/lib/SPVM/Webkit/DataHandler.spvm' \
 	  'lib/SPVM/Webkit/Handle.spvm' 'blib/lib/SPVM/Webkit/Handle.spvm' \
 	  'lib/SPVM/Webkit/Response.spvm' 'blib/lib/SPVM/Webkit/Response.spvm' \
-	  'lib/SPVM/Webkit/Select.c' 'blib/lib/SPVM/Webkit/Select.c' \
-	  'lib/SPVM/Webkit/Select.config' 'blib/lib/SPVM/Webkit/Select.config' \
-	  'lib/SPVM/Webkit/Select.spvm' 'blib/lib/SPVM/Webkit/Select.spvm' \
 	  'lib/SPVM/Webkit/Time.c' 'blib/lib/SPVM/Webkit/Time.c' \
 	  'lib/SPVM/Webkit/Time.config' 'blib/lib/SPVM/Webkit/Time.config' \
 	  'lib/SPVM/Webkit/Time.spvm' 'blib/lib/SPVM/Webkit/Time.spvm' \
@@ -933,12 +927,6 @@ config ::
 
 
 # --- MakeMaker postamble section:
-dynamic :: blib/lib/SPVM/Webkit/Select.so
-	$(NOECHO) $(NOOP)
-
-blib/lib/SPVM/Webkit/Select.so :: lib/SPVM/Webkit/Select.spvm lib/SPVM/Webkit/Select.c lib/SPVM/Webkit/Select.config
-	/home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin/perl -Mblib -MSPVM::Builder::API -e "SPVM::Builder::API->new(build_dir => '.spvm_build')->build_shared_lib_dist_native('Webkit::Select')"
-
 dynamic :: blib/lib/SPVM/Webkit/Time.so
 	$(NOECHO) $(NOOP)
 

@@ -88,14 +88,13 @@ class Webkit::URL {
     ++$start;
     for (my $i = $start; $i < $length; ++$i) {
       if ($url->[$i] == '/') {
-        $self->{path} .= Webkit::URL::Escape->unescape(
-          Fn->substr($url, $start, $i - $start)) . "/";
+        my $path_part_escaped = Fn->substr($url, $start, $i - $start);
+        $self->{path} .= Webkit::URL::Escape->unescape($path_part_escaped) . "/";
         $start = $i + 1;
       }
-      elsif ($url->[$i] == '?' ||
-          $url->[$i] == '#') {
-        $self->{path} .= Webkit::URL::Escape->unescape(
-          Fn->substr($url, $start, $i - $start));
+      elsif ($url->[$i] == '?' || $url->[$i] == '#') {
+        my $path_part_escaped = Fn->substr($url, $start, $i - $start);
+        $self->{path} .= Webkit::URL::Escape->unescape($path_part_escaped);
         return $i;
       }
     }

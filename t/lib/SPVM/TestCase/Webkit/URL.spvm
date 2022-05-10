@@ -1,4 +1,4 @@
-class TestCase::Lib::Webkit::URL {
+class TestCase::Webkit::URL {
   use Webkit::URL;
 
   static method test_parse_escape_all : int () {

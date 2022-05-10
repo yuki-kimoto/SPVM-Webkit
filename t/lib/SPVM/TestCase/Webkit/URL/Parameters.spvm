@@ -1,4 +1,4 @@
-class TestCase::Lib::Webkit::URL::Parameters {
+class TestCase::Webkit::URL::Parameters {
   use Webkit::URL::Parameters;
   use Fn;
 

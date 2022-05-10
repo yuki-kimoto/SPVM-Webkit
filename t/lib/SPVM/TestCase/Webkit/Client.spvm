@@ -1,4 +1,4 @@
-class TestCase::Lib::Webkit::Client {
+class TestCase::Webkit::Client {
   use Webkit::Client;
   use Hash;
   use IO::File;

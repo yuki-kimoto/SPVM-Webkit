@@ -1,4 +1,4 @@
-class TestCase::Lib::Webkit::CookieJar::CookieParser {
+class TestCase::Webkit::CookieJar::CookieParser {
   use Webkit::CookieJar::CookieParser;
   use Time;
   use Webkit::Time;

@@ -1,0 +1,3 @@
+class TestCase::Webkit::Util {
+  use Webkit::Util;
+}

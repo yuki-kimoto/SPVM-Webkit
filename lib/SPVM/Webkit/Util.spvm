@@ -1,23 +1,37 @@
 class Webkit::Util {
+  use Regex;
+  use Fn;
 
-  static method url_escape {
-    my ($str, $pattern) = @_;
-
-    if ($pattern) {
-      unless (exists $PATTERN{$pattern}) {
-        (my $quoted = $pattern) =~ s!([/\$\[])!\\$1!g;
-        $PATTERN{$pattern} = eval "static method { \$_[0] =~ s/([$quoted])/sprintf '%%%02X', ord \$1/ge }" or croak $@;
-      }
-      $PATTERN{$pattern}->($str);
-    }
-    else { $str =~ s/([^A-Za-z0-9\-._~])/sprintf '%%%02X', ord $1/ge }
-
-    return $str;
+  static method url_escape : string ($input : string) {
+    
+    # URL escape
+    my $re = Regex->new("([^A-Za-z0-9\-\._~])");
+    my $output = $re->replace_all_cb($input, 0, method : string ($re : Regex) {
+      my $cap0 = $re->captures->[0];
+      my $escaped_char = Fn->sprintf("%%%02X", $cap0);
+      return $escaped_char;
+    });
+    
+    return $output;
   }
 
-  static method url_unescape {
-    my $str = shift;
-    $str =~ s/%([0-9a-fA-F]{2})/chr hex $1/ge;
-    return $str;
+  static method url_unescape : string ($input : string) {
+    
+    # URL unescape
+    my $re = Regex->new("%([0-9a-fA-F]{2})");
+    my $output = $re->replace_all_cb($input, 0, method : string ($re : Regex) {
+      my $cap0 = $re->captures->[0];
+      my $hex = Fn->hex($cap0);
+      my $ch = Webkit::Util->chr($hex);
+      return $ch;
+    });
+    
+    return $output;
+  }
+  
+  static method chr : string ($ch_code : int) {
+    my $ch = Fn->sprintf("%c", $ch_code);
+    
+    return $ch;
   }
 }

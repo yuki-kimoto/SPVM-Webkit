@@ -201,13 +201,17 @@ TO_INST_PM = lib/SPVM/Webkit.pm \
 	lib/SPVM/Webkit/CookieJar/CookieParser.spvm \
 	lib/SPVM/Webkit/DataHandler.spvm \
 	lib/SPVM/Webkit/Handle.spvm \
+	lib/SPVM/Webkit/Parameters.spvm \
+	lib/SPVM/Webkit/Path.spvm \
 	lib/SPVM/Webkit/Response.spvm \
 	lib/SPVM/Webkit/Time.c \
 	lib/SPVM/Webkit/Time.config \
 	lib/SPVM/Webkit/Time.spvm \
 	lib/SPVM/Webkit/URL.spvm \
 	lib/SPVM/Webkit/URL/Escape.spvm \
-	lib/SPVM/Webkit/URL/Parameters.spvm
+	lib/SPVM/Webkit/URL/Parameters.spvm \
+	lib/SPVM/Webkit/URL2.spvm \
+	lib/SPVM/Webkit/Util.spvm
 
 
 # --- MakeMaker platform_constants section:
@@ -901,13 +905,17 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/SPVM/Webkit/CookieJar/CookieParser.spvm' 'blib/lib/SPVM/Webkit/CookieJar/CookieParser.spvm' \
 	  'lib/SPVM/Webkit/DataHandler.spvm' 'blib/lib/SPVM/Webkit/DataHandler.spvm' \
 	  'lib/SPVM/Webkit/Handle.spvm' 'blib/lib/SPVM/Webkit/Handle.spvm' \
+	  'lib/SPVM/Webkit/Parameters.spvm' 'blib/lib/SPVM/Webkit/Parameters.spvm' \
+	  'lib/SPVM/Webkit/Path.spvm' 'blib/lib/SPVM/Webkit/Path.spvm' \
 	  'lib/SPVM/Webkit/Response.spvm' 'blib/lib/SPVM/Webkit/Response.spvm' \
 	  'lib/SPVM/Webkit/Time.c' 'blib/lib/SPVM/Webkit/Time.c' \
 	  'lib/SPVM/Webkit/Time.config' 'blib/lib/SPVM/Webkit/Time.config' \
 	  'lib/SPVM/Webkit/Time.spvm' 'blib/lib/SPVM/Webkit/Time.spvm' \
 	  'lib/SPVM/Webkit/URL.spvm' 'blib/lib/SPVM/Webkit/URL.spvm' \
 	  'lib/SPVM/Webkit/URL/Escape.spvm' 'blib/lib/SPVM/Webkit/URL/Escape.spvm' \
-	  'lib/SPVM/Webkit/URL/Parameters.spvm' 'blib/lib/SPVM/Webkit/URL/Parameters.spvm' 
+	  'lib/SPVM/Webkit/URL/Parameters.spvm' 'blib/lib/SPVM/Webkit/URL/Parameters.spvm' \
+	  'lib/SPVM/Webkit/URL2.spvm' 'blib/lib/SPVM/Webkit/URL2.spvm' \
+	  'lib/SPVM/Webkit/Util.spvm' 'blib/lib/SPVM/Webkit/Util.spvm' 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 

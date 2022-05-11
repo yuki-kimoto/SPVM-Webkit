@@ -36,14 +36,14 @@ class Webkit::URL {
     my $self = shift;
 
     # Decode
-    return $self->host(join '.', map { /^xn--(.+)$/ ? punycode_decode $1 : $_ } split(/\./, shift, -1)) if @_;
+    return $self->host(join '.', map { $_ } split(/\./, shift, -1)) if @_;
 
     # Check if host needs to be encoded
     return undef unless defined(my $host = $self->host);
     return $host unless $host =~ /[^\x00-\x7f]/;
 
     # Encode
-    return join '.', map { /[^\x00-\x7f]/ ? ('xn--' . punycode_encode $_) : $_ } split(/\./, $host, -1);
+    return join '.', map { $_ } split(/\./, $host, -1);
   }
 
   method is_abs { !!shift->scheme }

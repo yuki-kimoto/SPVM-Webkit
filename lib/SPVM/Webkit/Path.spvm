@@ -2,8 +2,6 @@ class Webkit::Path {
 
   use Webkit::Util;
 
-  has charset : string; # UTF-8
-
   method canonicalize {
     my $self = shift;
 
@@ -21,7 +19,6 @@ class Webkit::Path {
     my $self = shift;
 
     my $clone = $self->new;
-    if (exists $self->{charset}) { $clone->{charset} = $self->{charset} }
     if (my $parts = $self->{parts}) {
       $clone->{$_} = $self->{$_} for qw(leading_slash trailing_slash);
       $clone->{parts} = [@$parts];
@@ -79,15 +76,12 @@ class Webkit::Path {
     my $self = shift;
 
     # Path
-    my $charset = $self->charset;
     if (defined(my $path = $self->{path})) {
-      $path = encode $charset, $path if $charset;
       return url_escape $path, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/';
     }
 
     # Build path
     my @parts = @{$self->parts};
-    @parts = map { encode $charset, $_ } @parts if $charset;
     my $path = join '/', map { url_escape $_, '^A-Za-z0-9\-._~!$&\'()*+,;=:@' } @parts;
     $path = "/$path" if $self->leading_slash;
     $path = "$path/" if $self->trailing_slash;
@@ -101,8 +95,6 @@ class Webkit::Path {
 
     unless ($self->{parts}) {
       my $path    = url_unescape delete($self->{path}) // '';
-      my $charset = $self->charset;
-      $path                   = decode($charset, $path) // $path if $charset;
       $self->{leading_slash}  = $path =~ s!^/!!;
       $self->{trailing_slash} = $path =~ s!/$!!;
       $self->{parts}          = [split /\//, $path, -1];

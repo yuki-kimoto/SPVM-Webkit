@@ -2,8 +2,6 @@ class Webkit::Parameters {
 
   use Webkit::Util;
 
-  has charset : string; # UTF-8
-
   method append {
     my $self = shift;
 
@@ -25,7 +23,6 @@ class Webkit::Parameters {
     my $self = shift;
 
     my $clone = $self->new;
-    if   (exists $self->{charset}) { $clone->{charset} = $self->{charset} }
     if   (defined $self->{string}) { $clone->{string}  = $self->{string} }
     else                           { $clone->{pairs}   = [@{$self->pairs}] }
 
@@ -75,7 +72,6 @@ class Webkit::Parameters {
       my $pairs = $self->{pairs} = [];
       return $pairs unless length $str;
 
-      my $charset = $self->charset;
       for my $pair (split /&/, $str) {
         next unless $pair =~ /^([^=]+)(?:=(.*))?$/;
         my ($name, $value) = ($1, $2 // '');
@@ -83,9 +79,7 @@ class Webkit::Parameters {
         # Replace "+" with whitespace, unescape and decode
         s/\+/ /g for $name, $value;
         $name  = url_unescape $name;
-        $name  = decode($charset, $name) // $name if $charset;
         $value = url_unescape $value;
-        $value = decode($charset, $value) // $value if $charset;
 
         push @$pairs, $name, $value;
       }
@@ -145,9 +139,7 @@ class Webkit::Parameters {
     my $self = shift;
 
     # String (RFC 3986)
-    my $charset = $self->charset;
     if (defined(my $str = $self->{string})) {
-      $str = encode $charset, $str if $charset;
       return url_escape $str, '^A-Za-z0-9\-._~%!$&\'()*+,;=:@/?';
     }
 
@@ -159,9 +151,7 @@ class Webkit::Parameters {
       my ($name, $value) = @{$pairs}[$i, $i + 1];
 
       # Escape and replace whitespace with "+"
-      $name  = encode $charset,   $name if $charset;
       $name  = url_escape $name,  '^*\-.0-9A-Z_a-z';
-      $value = encode $charset,   $value if $charset;
       $value = url_escape $value, '^*\-.0-9A-Z_a-z';
       s/\%20/\+/g for $name, $value;
 

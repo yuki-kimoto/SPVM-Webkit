@@ -11,14 +11,6 @@ class Webkit::Util {
     PC_INITIAL_N    = 128
   }
 
-  static method decode {
-    my ($encoding, $bytes) = @_;
-    return undef unless eval { $bytes = _encoding($encoding)->decode("$bytes", 1); 1 };
-    return $bytes;
-  }
-
-  static method encode { _encoding($_[0])->encode("$_[1]", 0) }
-
   # Direct translation of RFC 3492
   static method punycode_decode {
     my $input = shift;

@@ -5,7 +5,6 @@ class Webkit::Util {
   static method url_escape : string ($input : string) {
     
     # URL escape
-    my $re = Regex->new("([^A-Za-z0-9\-\._~])");
     my $output = Fn->replace($input, "([^A-Za-z0-9\-\._~])", method : string ($re : Regex) {
       my $bytes = $re->cap1;
       
@@ -28,13 +27,12 @@ class Webkit::Util {
   static method url_unescape : string ($input : string) {
     
     # URL unescape
-    my $re = Regex->new("%([0-9a-fA-F]{2,2})");
-    my $output = $re->replace_all_cb($input, 0, method : string ($re : Regex) {
+    my $output = Fn->replace($input, "%([0-9a-fA-F]{2,2})", method : string ($re : Regex) {
       my $cap1 = $re->cap1;
       my $hex = Fn->hex($cap1);
       my $ch = (string)[(byte)$hex];
       return $ch;
-    });
+    }, "g");
     
     return $output;
   }

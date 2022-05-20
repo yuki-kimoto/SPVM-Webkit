@@ -1,37 +1,41 @@
 class Webkit::Util {
-  use Regex;
   use Fn;
+  use Regex;
 
   static method url_escape : string ($input : string) {
     
     # URL escape
     my $re = Regex->new("([^A-Za-z0-9\-\._~])");
-    my $output = $re->replace_all_cb($input, 0, method : string ($re : Regex) {
-      my $cap0 = $re->captures->[0];
-      my $escaped_char = Fn->sprintf("%%%02X", $cap0);
+    my $output = Fn->replace($input, "([^A-Za-z0-9\-\._~])", method : string ($re : Regex) {
+      my $bytes = $re->cap1;
+      
+      my $escaped_char_buffer = StringBuffer->new;
+      
+      for (my $i = 0; $i < length $bytes; $i++) {
+        my $byte = $bytes->[$i];
+        my $hex_string = Fn->sprintf("%%%02X", $byte & 0xFF);
+        $escaped_char_buffer->push($hex_string);
+      }
+      
+      my $escaped_char = $escaped_char_buffer->to_string;
+      
       return $escaped_char;
-    });
+    }, "g");
     
     return $output;
   }
-
+  
   static method url_unescape : string ($input : string) {
     
     # URL unescape
     my $re = Regex->new("%([0-9a-fA-F]{2})");
     my $output = $re->replace_all_cb($input, 0, method : string ($re : Regex) {
-      my $cap0 = $re->captures->[0];
-      my $hex = Fn->hex($cap0);
-      my $ch = Webkit::Util->chr($hex);
+      my $cap1 = $re->cap1;
+      my $hex = Fn->hex($cap1);
+      my $ch = (string)[(byte)$hex];
       return $ch;
     });
     
     return $output;
-  }
-  
-  static method chr : string ($ch_code : int) {
-    my $ch = Fn->sprintf("%c", $ch_code);
-    
-    return $ch;
   }
 }

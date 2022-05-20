@@ -28,7 +28,7 @@ class Webkit::Util {
   static method url_unescape : string ($input : string) {
     
     # URL unescape
-    my $re = Regex->new("%([0-9a-fA-F]{2})");
+    my $re = Regex->new("%([0-9a-fA-F]{2,2})");
     my $output = $re->replace_all_cb($input, 0, method : string ($re : Regex) {
       my $cap1 = $re->cap1;
       my $hex = Fn->hex($cap1);

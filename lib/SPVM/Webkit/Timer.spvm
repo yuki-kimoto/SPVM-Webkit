@@ -1,0 +1,8 @@
+class Webkit::Timer {
+  use Webkit::Callback;
+  
+  has recurring : byte;
+  has cb : Webkit::Callback;
+  has after : int;
+  has time : long;
+}

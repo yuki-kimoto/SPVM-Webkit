@@ -1,0 +1,103 @@
+class Webkit::EventLoop {
+  use Webkit::Callback;
+  use Webkit::Timer;
+  use Time;
+  
+  our $SEED : int;
+  
+  BEGIN {
+    $SEED = Time->time;
+  }
+
+  has is_running : ro byte;
+  has timers : Hash;
+  
+  method new : EventLoop : void () {
+    return new Webkit::EventLoop;
+  }
+
+  method start : void {
+    $self->{running} = 1;
+    while ($self->{running}) {
+      $self->one_tick;
+    }
+  }
+
+  method stop : void { $self->{running} = 0; }
+
+  method set_interval : void ($after : int, $cb : Webkit::Callback) : void { return $self->_add_timer(1, $after, $cb); }
+
+  method set_timer : void ($after : int, $cb : Webkit::Callback) { return $self->_add_timer(0, $after, $cb); }
+
+  method _add_timer : void ($is_repeat : int, $after : int, $cb : Webkit::Callback) {
+    # Create timer id
+    my $id = $self->create_timer_id;
+    
+    my $timer = Webkit::Timer->new;
+    $timer->set_cb($cb);
+    $timer->set_after($after);
+    $timer->set_is_repeat($is_repeat);
+    $timer->set_time(Time->time + $after);
+    $self->{timers}->set($id => $timer);
+    
+    return $id;
+  }
+
+  method create_timer_id : int () {
+    my $id = 0;
+    while (1) {
+      my $seed = $SEED;
+      $id = "t" . Time->time . rand(\$seed);
+      $SEED = $seed;
+      
+      if ($self->{timers}->get($id)) {
+        next;
+      }
+      else {
+        last;
+      }
+    }
+    
+    return $id;
+  }
+
+  method one_tick : void () {
+    my $self = shift;
+
+    while ($self->{running}) {
+
+      # Stop automatically if there is nothing to watch
+      my $timers = $self->{timers};
+      my $timer_ids = $timers->keys;
+      
+      my $now = Time->time;
+      for (my $timer_id = 0; $timer_id < @$timer_ids; $timer_id++) {
+        my $timer = $timers->get($timer_id);
+        
+        if ($timer->{time} <= $now) {
+          next;
+        }
+
+        # Recurring timer
+        if ($timer->{is_repeat}) {
+          $timer->{time} = $now + $timer->{after};
+        }
+
+        # Normal timer
+        else { $self->remove_timer($timer_id) }
+        
+        my $cb = $timer->{cb};
+
+        eval { $cb->($self)); };
+        
+        if ($@) {
+          warn "Error $@";
+        }
+      }
+    }
+  }
+
+  method remove_timer : int ($id : int) {
+    return $self->{timers}->delete($id);
+  }
+}

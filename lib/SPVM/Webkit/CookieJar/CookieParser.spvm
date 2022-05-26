@@ -88,7 +88,7 @@ class Webkit::CookieJar::CookieParser {
 
   static method parse : Webkit::CookieJar::CookieParser ($string : string) {
     my $self = new Webkit::CookieJar::CookieParser;
-    $self->{extensions} = Hash->new(undef);
+    $self->{extensions} = Hash->new;
     my $items = Fn->split(";", $string);
     my $kv = Fn->split("=", $items->[0]);
     unless (@$kv == 2) {

@@ -20,6 +20,8 @@ WriteMakefile(
     },
     PREREQ_PM => {
         SPVM => 0.9500,
+        'SPVM::Unicode' => 0,
+        'SPVM::Regex' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'SPVM-Webkit-*' },

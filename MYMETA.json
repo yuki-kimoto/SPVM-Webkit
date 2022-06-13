@@ -33,6 +33,8 @@
       "runtime" : {
          "requires" : {
             "SPVM" : "0.95",
+            "SPVM::Regex" : "0",
+            "SPVM::Unicode" : "0",
             "perl" : "5.008007"
          }
       }

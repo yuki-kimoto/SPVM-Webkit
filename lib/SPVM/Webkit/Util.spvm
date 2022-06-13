@@ -1,11 +1,11 @@
 class Webkit::Util {
-  use Fn;
   use Regex;
 
   static method url_escape : string ($input : string) {
     
     # URL escape
-    my $output = Fn->replace($input, "([^A-Za-z0-9\-\._~])", method : string ($re : Regex) {
+    my $regex = Regex->new("([^A-Za-z0-9\-\._~])");
+    my $output = $regex->replace_all_cb($input, 0, method : string ($re : Regex) {
       my $bytes = $re->cap1;
       
       my $escaped_char_buffer = StringBuffer->new;
@@ -19,7 +19,7 @@ class Webkit::Util {
       my $escaped_char = $escaped_char_buffer->to_string;
       
       return $escaped_char;
-    }, "g");
+    });
     
     return $output;
   }
@@ -27,12 +27,13 @@ class Webkit::Util {
   static method url_unescape : string ($input : string) {
     
     # URL unescape
-    my $output = Fn->replace($input, "%([0-9a-fA-F]{2,2})", method : string ($re : Regex) {
+    my $regex = Regex->new("%([0-9a-fA-F]{2,2})");
+    my $output = $regex->replace_all_cb($input, 0, method : string ($re : Regex) {
       my $cap1 = $re->cap1;
       my $hex = Fn->hex($cap1);
       my $ch = (string)[(byte)$hex];
       return $ch;
-    }, "g");
+    });
     
     return $output;
   }

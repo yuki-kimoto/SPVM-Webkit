@@ -19,7 +19,7 @@
 #     MIN_PERL_VERSION => q[5.008007]
 #     NAME => q[SPVM::Webkit]
 #     PL_FILES => {  }
-#     PREREQ_PM => { SPVM=>q[0.95], Test::More=>q[0] }
+#     PREREQ_PM => { SPVM=>q[0.95], SPVM::Regex=>q[0], SPVM::Unicode=>q[0], Test::More=>q[0] }
 #     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/SPVM/Webkit.pm]
 #     clean => { FILES=>q[SPVM-Webkit-*] }
@@ -530,6 +530,8 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  SPVM: '\''0.95'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  SPVM::Regex: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  SPVM::Unicode: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  perl: '\''5.008007'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'version: '\''0.01'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
@@ -570,6 +572,8 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      "runtime" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '            "SPVM" : "0.95",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "SPVM::Regex" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "SPVM::Unicode" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "perl" : "5.008007"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
@@ -891,6 +895,8 @@ ppd :
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> SPVM-Webkit.ppd
 	$(NOECHO) $(ECHO) '        <PERLCORE VERSION="5,008007,0,0" />' >> SPVM-Webkit.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="SPVM::" VERSION="0.95" />' >> SPVM-Webkit.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="SPVM::Regex" />' >> SPVM-Webkit.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="SPVM::Unicode" />' >> SPVM-Webkit.ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-5.32" />' >> SPVM-Webkit.ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> SPVM-Webkit.ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> SPVM-Webkit.ppd
@@ -945,7 +951,7 @@ dynamic :: blib/lib/SPVM/Webkit/Time.so
 	$(NOECHO) $(NOOP)
 
 blib/lib/SPVM/Webkit/Time.so :: lib/SPVM/Webkit/Time.spvm lib/SPVM/Webkit/Time.c lib/SPVM/Webkit/Time.config
-	/home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin/perl -Mblib -MSPVM::Builder::API -e "SPVM::Builder::API->new(build_dir => '.spvm_build')->build_shared_lib_dist_native('Webkit::Time')"
+	/home/kimoto/perl5/perlbrew/perls/perl-5.32.1/bin/perl -Mblib -MSPVM::Builder::API -e "SPVM::Builder::API->new(build_dir => '.spvm_build')->build_dynamic_lib_dist_native('Webkit::Time')"
 
 
 

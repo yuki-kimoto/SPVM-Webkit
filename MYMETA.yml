@@ -19,6 +19,8 @@ no_index:
     - inc
 requires:
   SPVM: '0.95'
+  SPVM::Regex: '0'
+  SPVM::Unicode: '0'
   perl: '5.008007'
 version: '0.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,5 @@
 class Webkit::URL::Escape {
+  use Format;
 
   private static method HEX_CHARS : string () {
     return "0123456789ABCDEF";
@@ -70,7 +71,7 @@ class Webkit::URL::Escape {
       }
       else {
         unless ($str->[$i] == '%') {
-          warn Fn->sprintf("AAAAA %s, %c", $str, $str->[$i]);
+          warn Format->sprintf("AAAAA %s, %c", $str, $str->[$i]);
           die "string is broken. '%' is expected. str: $str";
         }
         unless ($i + 2 < $length) {

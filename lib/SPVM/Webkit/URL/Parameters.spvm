@@ -1,6 +1,7 @@
 class Webkit::URL::Parameters {
   use Webkit::URL::Escape;
   use Fn;
+  use Array;
 
   has params : string[][];
   has size : int;
@@ -76,7 +77,7 @@ class Webkit::URL::Parameters {
     for (my $i = 0; $i < $self->{size}; ++$i) {
       my $k = $self->{params}->[$i]->[0];
       if ($k eq $key) {
-        return (string[])Fn->copy_array_range_object($self->{params}->[$i],
+        return (string[])Array->copy_range_object($self->{params}->[$i],
           1, @{$self->{params}->[$i]} - 1);
       }
     }

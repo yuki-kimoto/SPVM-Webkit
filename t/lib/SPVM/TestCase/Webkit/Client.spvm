@@ -4,6 +4,7 @@ class TestCase::Webkit::Client {
   use IO::File;
   use StringBuffer;
   use Fn;
+  use Array;
 
   static method test_get : int () {
     my $client = Webkit::Client->new_opt([(object)

@@ -5,7 +5,9 @@ class Webkit::Client {
   use ByteList;
   use List;
   use Fn;
+  use Array;
   use Webkit::DataHandler;
+  use Sort;
   
   has default_headers : public Hash;
   has timeout : public double;
@@ -80,7 +82,7 @@ class Webkit::Client {
       }
     }
     my $terms_array = $terms->to_array;
-    Fn->sort_string($terms_array, 0, scalar @$terms_array, method : int ($x : string, $y : string) { return $x cmp $y; });
+    Sort->sort_string($terms_array, 0, scalar @$terms_array, method : int ($x : string, $y : string) { return $x cmp $y; });
     return Fn->join("&", $terms_array);
   }
 

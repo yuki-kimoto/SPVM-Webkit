@@ -2,6 +2,7 @@ class Webkit::CookieJar::CookieParser {
   use Hash;
   use Time;
   use Fn;
+  use Array;
   use Webkit::Time;
 
   has name : public string;

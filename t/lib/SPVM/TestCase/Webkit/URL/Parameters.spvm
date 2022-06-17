@@ -1,6 +1,7 @@
 class TestCase::Webkit::URL::Parameters {
   use Webkit::URL::Parameters;
   use Fn;
+  use Array;
 
   static method test_escape : int () {
     my $params = Webkit::URL::Parameters->new;
@@ -60,18 +61,18 @@ class TestCase::Webkit::URL::Parameters {
       return 0;
     }
     $params->add("k", "v1");
-    unless (Fn->equals_array_string($params->keys, ["k"])) {
+    unless (Array->equals_string($params->keys, ["k"])) {
       return 0;
     }
     $params->add("k", "v2");
-    unless (Fn->equals_array_string($params->keys, ["k"])) {
+    unless (Array->equals_string($params->keys, ["k"])) {
       return 0;
     }
     $params->add("k2", "v3");
     {
       my $keys = $params->keys;
-      unless (Fn->equals_array_string($keys, ["k", "k2"]) ||
-          Fn->equals_array_string($keys, ["k2", "k"])) {
+      unless (Array->equals_string($keys, ["k", "k2"]) ||
+          Array->equals_string($keys, ["k2", "k"])) {
         return 0;
       }
     }

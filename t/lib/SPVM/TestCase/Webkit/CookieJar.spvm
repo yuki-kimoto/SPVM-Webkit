@@ -144,7 +144,8 @@ class TestCase::Webkit::CookieJar {
   static method test_add_path_last_is_file_when_no_path_attr : int () {
     my $cookiejar = Webkit::CookieJar->new;
     $cookiejar->add("http://www.example.com/path/to/file", "foo=bar");
-    my $cookie = $cookiejar->_cookie_from_jar("foo", "www.example.com", "/path/to");
+    my $cookie = $cookiejar->_cookie_from_jar("foo", "www.example.com", "/path/to/file");
+    
     unless ($cookie->{value} eq "bar") {
       return 0;
     }
@@ -154,7 +155,7 @@ class TestCase::Webkit::CookieJar {
   static method test_add_path_use_default_path_when_broken_root : int () {
     my $cookiejar = Webkit::CookieJar->new;
     $cookiejar->add("http://www.example.com/path/to/item", "foo=bar; Path=hoge");
-    my $cookie = $cookiejar->_cookie_from_jar("foo", "www.example.com", "/path/to");
+    my $cookie = $cookiejar->_cookie_from_jar("foo", "www.example.com", "/path/to/item");
     unless ($cookie->{value} eq "bar") {
       return 0;
     }

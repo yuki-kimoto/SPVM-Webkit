@@ -101,6 +101,7 @@ class Webkit::CookieJar {
     if ($rsep == 0) {
       return "/";
     }
+    
     return Fn->substr($url_path, 0, $rsep);
   }
 
@@ -231,7 +232,7 @@ class Webkit::CookieJar {
     for (my $i = 0; $i < $matched->length; ++$i) {
       $ret->[$i] = (Webkit::CookieJar::Cookie)($matched->get($i));
     }
-    Sort->sort_object($ret, 0, scalar @$ret, method : int ($lhs : object, $rhs : object) {
+    Sort->sort_object($ret, method : int ($lhs : object, $rhs : object) {
       my $l = (Webkit::CookieJar::Cookie)$lhs;
       my $r = (Webkit::CookieJar::Cookie)$rhs;
       if (length $l->{path} > length $r->{path} ||

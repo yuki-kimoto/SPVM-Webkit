@@ -4,6 +4,7 @@ class Webkit::CookieJar::CookieParser {
   use Fn;
   use Array;
   use Webkit::Time;
+  use Time::Local;
 
   has name : public string;
   has value : public string;
@@ -69,7 +70,7 @@ class Webkit::CookieJar::CookieParser {
           length $av - $key_length - 1));
       my $lc_key = Fn->lc($key);
       if ($lc_key eq "expires") {
-        $self->{expires} = Time->timegm(
+        $self->{expires} = Time::Local->timegm(
             Webkit::Time->strptime($val, &RFC1123_FORMAT()));
       }
       elsif ($lc_key eq "max-age") {

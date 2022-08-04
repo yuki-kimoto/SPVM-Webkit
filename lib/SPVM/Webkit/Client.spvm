@@ -26,7 +26,7 @@ class Webkit::Client {
     return $self;
   }
 
-  static method new_opt : Webkit::Client ($args : object[]) {
+  static method new : Webkit::Client ($args = undef : object[]) {
 
     my $h = Hash->new($args);
     my $self = new Webkit::Client;
@@ -134,7 +134,7 @@ class Webkit::Client {
   }
 
   private method _open_handle : Webkit::Handle ($host : string, $port : int) {
-    my $handle = Webkit::Handle->new_opt([(object)
+    my $handle = Webkit::Handle->new([(object)
       timeout => $self->{timeout},
     ]);
     return $handle->connect(Hash->new({

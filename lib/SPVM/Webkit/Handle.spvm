@@ -16,7 +16,7 @@ class Webkit::Handle {
     $_BUFSIZE = 32768;
   }
 
-  static method new_opt : Webkit::Handle ($args : object[]) {
+  static method new : Webkit::Handle ($args = undef : object[]) {
     my $h = Hash->new($args);
     my $self = new Webkit::Handle;
     if (my $o = $h->get("timeout")) {
@@ -309,7 +309,7 @@ class Webkit::Handle {
     my $status = &_capture($line, 3, \$pos);
     &_read_as_ws($line, \$pos);
     my $reason = Fn->substr($line, $pos, length($line) - $pos - 2);
-    return Webkit::Response->new_opt([(object)
+    return Webkit::Response->new([(object)
       protocol => "HTTP/$version",
       status   => &_as_digits($status),
       reason   => $reason,

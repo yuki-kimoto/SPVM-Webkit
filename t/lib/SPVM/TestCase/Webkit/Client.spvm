@@ -7,7 +7,7 @@ class TestCase::Webkit::Client {
   use Array;
 
   static method test_get : int () {
-    my $client = Webkit::Client->new_opt([(object)
+    my $client = Webkit::Client->new([(object)
       default_headers => Hash->new({Accept => "*/*"})
     ]);
 
@@ -25,7 +25,7 @@ class TestCase::Webkit::Client {
   }
 
   static method test_head : int () {
-    my $client = Webkit::Client->new_opt([(object)
+    my $client = Webkit::Client->new([(object)
       default_headers => Hash->new({Accept => "*/*"})
     ]);
 
@@ -43,7 +43,7 @@ class TestCase::Webkit::Client {
   }
 
   static method test_post : int () {
-    my $client = Webkit::Client->new_opt([(object)
+    my $client = Webkit::Client->new([(object)
       default_headers => Hash->new({Accept => "*/*"})
     ]);
 
@@ -63,7 +63,7 @@ class TestCase::Webkit::Client {
   }
 
   static method test_post_form : int () {
-    my $client = Webkit::Client->new_opt([(object)
+    my $client = Webkit::Client->new([(object)
       default_headers => Hash->new({Accept => "*/*"})
     ]);
 
@@ -87,7 +87,7 @@ class TestCase::Webkit::Client {
   }
 
   static method test_post_form_syntax_sugar : int () {
-    my $client = Webkit::Client->new_opt([(object)
+    my $client = Webkit::Client->new([(object)
       default_headers => Hash->new({Accept => "*/*"})
     ]);
 
@@ -107,7 +107,7 @@ class TestCase::Webkit::Client {
   }
 
   static method test_get_chunk_small : int () {
-    my $client = Webkit::Client->new_opt([(object)
+    my $client = Webkit::Client->new([(object)
       default_headers => Hash->new({Accept => "*/*"})
     ]);
 
@@ -131,7 +131,7 @@ class TestCase::Webkit::Client {
   }
 
   static method test_get_chunk_large : int () {
-    my $client = Webkit::Client->new_opt([(object)
+    my $client = Webkit::Client->new([(object)
       default_headers => Hash->new({Accept => "*/*"})
     ]);
 

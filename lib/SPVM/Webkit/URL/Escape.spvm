@@ -71,7 +71,7 @@ class Webkit::URL::Escape {
       }
       else {
         unless ($str->[$i] == '%') {
-          warn Format->sprintf("AAAAA %s, %c", $str, $str->[$i]);
+          warn Format->sprintf("AAAAA %s, %c", [$str, $str->[$i]]);
           die "string is broken. '%' is expected. str: $str";
         }
         unless ($i + 2 < $length) {

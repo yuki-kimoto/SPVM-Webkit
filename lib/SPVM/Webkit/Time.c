@@ -339,15 +339,15 @@ int32_t SPVM__Webkit__Time__strptime(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_time_info = env->new_object_by_name(env, stack, "SPVM::Time::Info", &e, FILE_NAME, __LINE__);
   if (e) { return e; }
 
-  env->set_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "sec", resultp.tm_sec, &e, FILE_NAME, __LINE__);
-  env->set_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "min", resultp.tm_min, &e, FILE_NAME, __LINE__);
-  env->set_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "hour", resultp.tm_hour, &e, FILE_NAME, __LINE__);
-  env->set_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "mday", resultp.tm_mday, &e, FILE_NAME, __LINE__);
-  env->set_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "mon", resultp.tm_mon, &e, FILE_NAME, __LINE__);
-  env->set_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "year", resultp.tm_year, &e, FILE_NAME, __LINE__);
-  env->set_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "wday", resultp.tm_wday, &e, FILE_NAME, __LINE__);
-  env->set_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "yday", resultp.tm_yday, &e, FILE_NAME, __LINE__);
-  env->set_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "isdst", resultp.tm_isdst, &e, FILE_NAME, __LINE__);
+  env->set_field_int_by_name(env, stack, obj_time_info, "sec", resultp.tm_sec, &e, FILE_NAME, __LINE__);
+  env->set_field_int_by_name(env, stack, obj_time_info, "min", resultp.tm_min, &e, FILE_NAME, __LINE__);
+  env->set_field_int_by_name(env, stack, obj_time_info, "hour", resultp.tm_hour, &e, FILE_NAME, __LINE__);
+  env->set_field_int_by_name(env, stack, obj_time_info, "mday", resultp.tm_mday, &e, FILE_NAME, __LINE__);
+  env->set_field_int_by_name(env, stack, obj_time_info, "mon", resultp.tm_mon, &e, FILE_NAME, __LINE__);
+  env->set_field_int_by_name(env, stack, obj_time_info, "year", resultp.tm_year, &e, FILE_NAME, __LINE__);
+  env->set_field_int_by_name(env, stack, obj_time_info, "wday", resultp.tm_wday, &e, FILE_NAME, __LINE__);
+  env->set_field_int_by_name(env, stack, obj_time_info, "yday", resultp.tm_yday, &e, FILE_NAME, __LINE__);
+  env->set_field_int_by_name(env, stack, obj_time_info, "isdst", resultp.tm_isdst, &e, FILE_NAME, __LINE__);
   
   stack[0].oval = obj_time_info;
   
@@ -367,15 +367,15 @@ int32_t SPVM__Webkit__Time__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
 
   struct tm resultp;
 
-  resultp.tm_sec = env->get_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "sec", &e, FILE_NAME, __LINE__);
-  resultp.tm_min = env->get_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "min", &e, FILE_NAME, __LINE__);
-  resultp.tm_hour = env->get_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "hour", &e, FILE_NAME, __LINE__);
-  resultp.tm_mday = env->get_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "mday", &e, FILE_NAME, __LINE__);
-  resultp.tm_mon = env->get_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "mon", &e, FILE_NAME, __LINE__);
-  resultp.tm_year = env->get_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "year", &e, FILE_NAME, __LINE__);
-  resultp.tm_wday = env->get_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "wday", &e, FILE_NAME, __LINE__);
-  resultp.tm_yday = env->get_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "yday", &e, FILE_NAME, __LINE__);
-  resultp.tm_isdst = env->get_field_int_by_name(env, stack, obj_time_info, "SPVM::Time::Info", "isdst", &e, FILE_NAME, __LINE__);
+  resultp.tm_sec = env->get_field_int_by_name(env, stack, obj_time_info, "sec", &e, FILE_NAME, __LINE__);
+  resultp.tm_min = env->get_field_int_by_name(env, stack, obj_time_info, "min", &e, FILE_NAME, __LINE__);
+  resultp.tm_hour = env->get_field_int_by_name(env, stack, obj_time_info, "hour", &e, FILE_NAME, __LINE__);
+  resultp.tm_mday = env->get_field_int_by_name(env, stack, obj_time_info, "mday", &e, FILE_NAME, __LINE__);
+  resultp.tm_mon = env->get_field_int_by_name(env, stack, obj_time_info, "mon", &e, FILE_NAME, __LINE__);
+  resultp.tm_year = env->get_field_int_by_name(env, stack, obj_time_info, "year", &e, FILE_NAME, __LINE__);
+  resultp.tm_wday = env->get_field_int_by_name(env, stack, obj_time_info, "wday", &e, FILE_NAME, __LINE__);
+  resultp.tm_yday = env->get_field_int_by_name(env, stack, obj_time_info, "yday", &e, FILE_NAME, __LINE__);
+  resultp.tm_isdst = env->get_field_int_by_name(env, stack, obj_time_info, "isdst", &e, FILE_NAME, __LINE__);
   
   char str[256] = {0};
   int32_t count = strftime(str, 256, format, &resultp);
